@@ -34,7 +34,7 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     @property
     def admin_url(self) -> str:
         """Return the admin URL."""
-        protocol = "https" if self.port == 443 else "http"
+        protocol = "https" if self.client._use_ssl else "http"
         return f"{protocol}://{self.host}:{self.port}/admin"
 
     async def _async_update_data(self) -> dict[str, Any]:

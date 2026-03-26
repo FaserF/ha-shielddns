@@ -8,7 +8,14 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .client import ShieldDNSApiClient
-from .const import CONF_HOST, CONF_PORT, CONF_TOKEN, DOMAIN
+from .const import (
+    CONF_HOST,
+    CONF_PORT,
+    CONF_TOKEN,
+    CONF_USE_SSL,
+    CONF_VERIFY_SSL,
+    DOMAIN,
+)
 from .coordinator import ShieldDNSDataUpdateCoordinator
 
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.SWITCH, Platform.BUTTON]
@@ -29,7 +36,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     session = async_get_clientsession(hass)
     host = entry.data[CONF_HOST]
     port = entry.data[CONF_PORT]
-    client = ShieldDNSApiClient(host, port, entry.data[CONF_TOKEN], session=session)
+    client = ShieldDNSApiClient(
+        host,
+        port,
+        entry.data[CONF_TOKEN],
+        session=session,
+        use_ssl=entry.data.get(CONF_USE_SSL, True),
+        verify_ssl=entry.data.get(CONF_VERIFY_SSL, True),
+    )
 
     coordinator = ShieldDNSDataUpdateCoordinator(hass, client, host, port)
     await coordinator.async_config_entry_first_refresh()

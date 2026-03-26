@@ -7,7 +7,9 @@
         "data": {
           "host": "Host/IP Address",
           "port": "Port",
-          "token": "API Token"
+          "token": "API Token",
+          "use_ssl": "Use HTTPS (SSL/TLS)",
+          "verify_ssl": "Verify SSL Certificate"
         }
       }
     },

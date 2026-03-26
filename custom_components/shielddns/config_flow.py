@@ -13,13 +13,23 @@ from .client import (
     ShieldDNSApiClientAuthenticationError,
     ShieldDNSApiClientCommunicationError,
 )
-from .const import CONF_HOST, CONF_PORT, CONF_TOKEN, DEFAULT_PORT, DOMAIN
+from .const import (
+    CONF_HOST,
+    CONF_PORT,
+    CONF_TOKEN,
+    CONF_USE_SSL,
+    CONF_VERIFY_SSL,
+    DEFAULT_PORT,
+    DOMAIN,
+)
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_HOST): str,
         vol.Required(CONF_PORT, default=DEFAULT_PORT): int,
         vol.Required(CONF_TOKEN): str,
+        vol.Optional(CONF_USE_SSL, default=True): bool,
+        vol.Optional(CONF_VERIFY_SSL, default=True): bool,
     }
 )
 
@@ -32,6 +42,8 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
         port=data[CONF_PORT],
         token=data[CONF_TOKEN],
         session=session,
+        use_ssl=data.get(CONF_USE_SSL, True),
+        verify_ssl=data.get(CONF_VERIFY_SSL, True),
     )
 
     await client.get_stats()

@@ -28,15 +28,18 @@ class ShieldDNSApiClient:
         port: int,
         token: str,
         session: aiohttp.ClientSession,
+        use_ssl: bool = True,
+        verify_ssl: bool = True,
     ) -> None:
         """Initialize."""
         self._host = host
         self._port = port
         self._token = token
         self._session = session
+        self._use_ssl = use_ssl
+        self._verify_ssl = verify_ssl
 
-        # ShieldDNS admin usually runs on HTTPS, fallback to HTTP if 80/8080 used
-        schema = "https" if port == 443 else "http"
+        schema = "https" if use_ssl else "http"
         self._base_url = f"{schema}://{host}:{port}/api"
 
     async def _api_wrapper(
@@ -58,6 +61,7 @@ class ShieldDNSApiClient:
                     url=url,
                     headers=headers,
                     json=data,
+                    ssl=self._verify_ssl if self._use_ssl else None,
                 )
                 if response.status in (401, 403):
                     raise ShieldDNSApiClientAuthenticationError("Invalid credentials")
