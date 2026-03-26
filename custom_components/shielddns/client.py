@@ -61,7 +61,7 @@ class ShieldDNSApiClient:
                     url=url,
                     headers=headers,
                     json=data,
-                    ssl=self._verify_ssl if self._use_ssl else None,
+                    ssl=self._verify_ssl if self._use_ssl else False,
                 )
                 if response.status in (401, 403):
                     raise ShieldDNSApiClientAuthenticationError("Invalid credentials")

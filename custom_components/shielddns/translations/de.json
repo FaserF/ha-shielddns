@@ -7,7 +7,9 @@
         "data": {
           "host": "Host/IP-Adresse",
           "port": "Port",
-          "token": "API-Token"
+          "token": "API-Token",
+          "use_ssl": "HTTPS verwenden (SSL/TLS)",
+          "verify_ssl": "SSL-Zertifikat prüfen"
         }
       }
     },
@@ -33,6 +35,9 @@
       },
       "unique_clients": {
         "name": "Aktive Clients"
+      },
+      "shielddns_version": {
+        "name": "ShieldDNS Version"
       },
       "coredns_version": {
         "name": "CoreDNS Version"

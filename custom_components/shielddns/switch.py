@@ -6,10 +6,10 @@ from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
 from .coordinator import ShieldDNSDataUpdateCoordinator
+from .entity import ShieldDNSEntity
 
 
 async def async_setup_entry(
@@ -21,9 +21,6 @@ async def async_setup_entry(
     coordinator: ShieldDNSDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
 
     async_add_entities([ShieldDNSGlobalFilteringSwitch(coordinator, entry.entry_id)])
-
-
-from .entity import ShieldDNSEntity
 
 
 class ShieldDNSGlobalFilteringSwitch(ShieldDNSEntity, SwitchEntity):
