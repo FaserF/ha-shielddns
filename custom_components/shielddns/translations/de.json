@@ -1,0 +1,52 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Verbinde mit ShieldDNS",
+        "description": "Hilfe gibt es in der Dokumentation unter https://github.com/FaserF/ha-shielddns",
+        "data": {
+          "host": "Host/IP-Adresse",
+          "port": "Port",
+          "token": "API-Token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen",
+      "invalid_auth": "Ungültige Authentifizierung",
+      "unknown": "Unerwarteter Fehler"
+    },
+    "abort": {
+      "already_configured": "Gerät ist bereits konfiguriert"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "total_queries": {
+        "name": "Gesamte Anfragen heute"
+      },
+      "blocked_queries": {
+        "name": "Blockierte Anfragen heute"
+      },
+      "block_percentage": {
+        "name": "Blockierte Anfragen in Prozent"
+      },
+      "unique_clients": {
+        "name": "Aktive Clients"
+      },
+      "coredns_version": {
+        "name": "CoreDNS Version"
+      }
+    },
+    "switch": {
+      "global_filtering": {
+        "name": "Globaler Filter"
+      }
+    },
+    "button": {
+      "refresh_lists": {
+        "name": "Blocklisten aktualisieren"
+      }
+    }
+  }
+}

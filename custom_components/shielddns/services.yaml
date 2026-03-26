@@ -1,0 +1,37 @@
+# Describes the services for ShieldDNS
+
+block_domain:
+  name: Block Domain
+  description: Instantly adds a domain to the ShieldDNS blocklist.
+  fields:
+    domain:
+      name: Domain
+      description: The domain to block (e.g., tiktok.com).
+      required: true
+      example: "tiktok.com"
+      selector:
+        text:
+
+allow_domain:
+  name: Allow Domain
+  description: Instantly adds a domain to the ShieldDNS allowlist (whitelist).
+  fields:
+    domain:
+      name: Domain
+      description: The domain to allow (e.g., netflix.com).
+      required: true
+      example: "netflix.com"
+      selector:
+        text:
+
+remove_rule:
+  name: Remove Domain Rule
+  description: Removes a domain from both the blocklist and allowlist.
+  fields:
+    domain:
+      name: Domain
+      description: The domain to remove (e.g., tiktok.com).
+      required: true
+      example: "tiktok.com"
+      selector:
+        text:
