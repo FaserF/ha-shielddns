@@ -47,9 +47,6 @@
       "unique_clients": {
         "name": "Unique Clients"
       },
-      "shielddns_version": {
-        "name": "ShieldDNS Version"
-      },
       "avg_response_time": {
         "name": "Avg. Response Time"
       },

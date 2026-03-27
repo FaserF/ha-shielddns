@@ -29,11 +29,12 @@ No manual script-polling or complex setup is required — everything is handled 
   - **Blocked Queries**: See how many ads, trackers, and malicious domains were stopped.
   - **Block Percentage**: Real-time ratio of blocked vs allowed traffic.
   - **Unique Clients**: Monitor how many individual devices are currently utilizing ShieldDNS.
+  - **Performance Metrics**: Monitor **Average Response Time** (latency) and **Cache Hit Ratio** to ensure peak resolution speed.
 - **Instance Management**:
   - **Global Filtering (Toggle)**: Instantly suspend or resume all blocklists and filtering across your entire network with a single switch.
   - **Refresh Blocklists**: Native button to sync and update your blocklists on demand.
 - **System Information**:
-  - Track your ShieldDNS and embedded CoreDNS versions directly as sensors.
+  - Track your ShieldDNS instance performance directly via sensors.
 - **Native Experience**:
   - **Full Localization**: English translations included (more coming soon).
   - **Modern UI**: High-quality icons and branding for a premium dashboard look.
@@ -95,6 +96,9 @@ The integration requires an API Token to communicate with your ShieldDNS instanc
    - **API Token**: The token you generated in Step 1.
 4. The integration will now connect, authenticate, and automatically add your sensors and switches.
 
+> [!NOTE]
+> **Adjust later**: You can update your **API Token** or change the **Update Interval** (default: 5 minutes) at any time by going to the integration page in Home Assistant and clicking **Configure**.
+
 ## 🧱 Entities
 
 The integration provides the following entities to monitor and control your DNS network:
@@ -104,8 +108,8 @@ The integration provides the following entities to monitor and control your DNS 
 - **Blocked Queries Today**: Absolute count of requests blocked by your filter lists.
 - **Block Percentage**: The percentage of today's total traffic that was blocked.
 - **Unique Clients**: How many client IPs have made queries in the last 24 hours.
-- **ShieldDNS Version**: Current application version (e.g., `v1.1.0`).
-- **CoreDNS Version**: Current DNS engine version (e.g., `v1.14.2`).
+- **Avg. Response Time**: The average latency of DNS resolutions in milliseconds.
+- **Cache Hit Ratio**: Effectiveness of the local cache (percentage of queries served from cache).
 
 ### Switch
 - **Global Filtering**: Turn this off to temporarily disable all ad-blocking and filtering. Turn it back on to resume normal protection.
