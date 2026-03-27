@@ -252,6 +252,7 @@ async def mock_integration_loading(hass: HomeAssistant) -> None:
     hass.data.setdefault("integrations", {})
     hass.data.setdefault("components", {})
     hass.data.setdefault("preload_platforms", {})
+    hass.data.setdefault("missing_platforms", {})
 
     manifest = loader.Manifest(
         name="ShieldDNS",
