@@ -64,5 +64,37 @@
         "name": "Blocklisten aktualisieren"
       }
     }
+  },
+  "services": {
+    "block_domain": {
+      "name": "Domain blockieren",
+      "description": "Fügt eine Domain sofort zur ShieldDNS-Blockliste hinzu.",
+      "fields": {
+        "domain": {
+          "name": "Domain",
+          "description": "Die zu blockierende Domain (z. B. tiktok.com)."
+        }
+      }
+    },
+    "allow_domain": {
+      "name": "Domain erlauben",
+      "description": "Fügt eine Domain sofort zur ShieldDNS-Erlaubnisliste (Whitelist) hinzu.",
+      "fields": {
+        "domain": {
+          "name": "Domain",
+          "description": "Die zu erlaubende Domain (z. B. netflix.com)."
+        }
+      }
+    },
+    "remove_rule": {
+      "name": "Domain-Regel entfernen",
+      "description": "Entfernt eine Domain sowohl von der Blockliste als auch von der Erlaubnisliste.",
+      "fields": {
+        "domain": {
+          "name": "Domain",
+          "description": "Die zu entfernende Domain (z. B. tiktok.com)."
+        }
+      }
+    }
   }
 }

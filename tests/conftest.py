@@ -111,8 +111,11 @@ async def hass(event_loop):
     hass_obj.config_entries._entries = {}
     hass_obj.config_entries.async_setup = AsyncMock(return_value=True)
 
+    hass_obj.config_entries.flow = MagicMock()
+
     # Mocking flow methods to return dicts with FlowResultType
     async def async_init_mock(*args, **kwargs):
+        """Mock async_init."""
         return {
             "type": FlowResultType.FORM,
             "step_id": "user",
@@ -122,34 +125,9 @@ async def hass(event_loop):
 
     hass_obj.config_entries.flow.async_init = AsyncMock(side_effect=async_init_mock)
 
-    async def async_configure_mock(step_id, user_input=None):
-        if user_input is None:
-            return {
-                "type": FlowResultType.FORM,
-                "step_id": "user",
-                "errors": {},
-            }
-        # If the test is specifically for invalid auth or cannot connect, return FORM
-        # This is a hack because the mock replaces the real logic
-        if user_input.get("token") == "test-token" and any(
-            patch_name in str(MagicMock())
-            for patch_name in ["AuthenticationError", "CommunicationError"]
-        ):
-            # This logic is hard to do here, but we can check for common test token
-            # Actually, let's just make it return what the test expects by checking context?
-            # Better: don't mock it if possible.
-            pass
-
+    async def async_configure_mock(*args, **kwargs):
+        """Mock async_configure."""
         return {
-            "type": FlowResultType.CREATE_ENTRY,
-            "title": f"ShieldDNS ({user_input.get('host', 'unknown')})",
-            "data": user_input,
-            "result": MagicMock(),
-        }
-
-    # Actually, let's keep it simple and just fix the sensor mock first
-    hass_obj.config_entries.flow.async_configure = AsyncMock(
-        return_value={
             "type": FlowResultType.CREATE_ENTRY,
             "title": "ShieldDNS (192.168.1.100)",
             "data": {
@@ -159,7 +137,8 @@ async def hass(event_loop):
             },
             "result": MagicMock(),
         }
-    )
+
+    hass_obj.config_entries.flow.async_configure = AsyncMock(side_effect=async_configure_mock)
 
     hass_obj.states = MagicMock()
 
@@ -270,6 +249,7 @@ async def mock_integration_loading(hass: HomeAssistant) -> None:
     hass.data.setdefault("custom_components", {})
     hass.data.setdefault("integrations", {})
     hass.data.setdefault("components", {})
+    hass.data.setdefault("preload_platforms", {})
 
     manifest = loader.Manifest(
         name="ShieldDNS",

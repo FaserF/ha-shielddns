@@ -64,5 +64,37 @@
         "name": "Refresh Blocklists"
       }
     }
+  },
+  "services": {
+    "block_domain": {
+      "name": "Block Domain",
+      "description": "Instantly adds a domain to the ShieldDNS blocklist.",
+      "fields": {
+        "domain": {
+          "name": "Domain",
+          "description": "The domain to block (e.g., tiktok.com)."
+        }
+      }
+    },
+    "allow_domain": {
+      "name": "Allow Domain",
+      "description": "Instantly adds a domain to the ShieldDNS allowlist (whitelist).",
+      "fields": {
+        "domain": {
+          "name": "Domain",
+          "description": "The domain to allow (e.g., netflix.com)."
+        }
+      }
+    },
+    "remove_rule": {
+      "name": "Remove Domain Rule",
+      "description": "Removes a domain from both the blocklist and allowlist.",
+      "fields": {
+        "domain": {
+          "name": "Domain",
+          "description": "The domain to remove (e.g., tiktok.com)."
+        }
+      }
+    }
   }
 }
