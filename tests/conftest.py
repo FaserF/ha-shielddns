@@ -138,7 +138,9 @@ async def hass(event_loop):
             "result": MagicMock(),
         }
 
-    hass_obj.config_entries.flow.async_configure = AsyncMock(side_effect=async_configure_mock)
+    hass_obj.config_entries.flow.async_configure = AsyncMock(
+        side_effect=async_configure_mock
+    )
 
     hass_obj.states = MagicMock()
 
