@@ -62,28 +62,43 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Register Services
     async def async_block_domain(call: ServiceCall) -> None:
         """Block a domain via ShieldDNS."""
-        for _, coord in hass.data[DOMAIN].items():
-            await coord.client.add_rule(call.data["domain"], "block")
+        from homeassistant.helpers.service import async_extract_config_entry_ids
+
+        entry_ids = await async_extract_config_entry_ids(hass, call)
+        for entry_id in entry_ids or hass.data[DOMAIN]:
+            if coord := hass.data[DOMAIN].get(entry_id):
+                await coord.client.add_rule(call.data["domain"], "block")
 
     async def async_allow_domain(call: ServiceCall) -> None:
         """Allow a domain via ShieldDNS."""
-        for _, coord in hass.data[DOMAIN].items():
-            await coord.client.add_rule(call.data["domain"], "allow")
+        from homeassistant.helpers.service import async_extract_config_entry_ids
+
+        entry_ids = await async_extract_config_entry_ids(hass, call)
+        for entry_id in entry_ids or hass.data[DOMAIN]:
+            if coord := hass.data[DOMAIN].get(entry_id):
+                await coord.client.add_rule(call.data["domain"], "allow")
 
     async def async_remove_rule(call: ServiceCall) -> None:
         """Remove a domain rule via ShieldDNS."""
-        for _, coord in hass.data[DOMAIN].items():
-            await coord.client.remove_rule(call.data["domain"])
+        from homeassistant.helpers.service import async_extract_config_entry_ids
 
-    hass.services.async_register(
-        DOMAIN, SERVICE_BLOCK_DOMAIN, async_block_domain, schema=DOMAIN_SCHEMA
-    )
-    hass.services.async_register(
-        DOMAIN, SERVICE_ALLOW_DOMAIN, async_allow_domain, schema=DOMAIN_SCHEMA
-    )
-    hass.services.async_register(
-        DOMAIN, SERVICE_REMOVE_RULE, async_remove_rule, schema=DOMAIN_SCHEMA
-    )
+        entry_ids = await async_extract_config_entry_ids(hass, call)
+        for entry_id in entry_ids or hass.data[DOMAIN]:
+            if coord := hass.data[DOMAIN].get(entry_id):
+                await coord.client.remove_rule(call.data["domain"])
+
+    if not hass.services.has_service(DOMAIN, SERVICE_BLOCK_DOMAIN):
+        hass.services.async_register(
+            DOMAIN, SERVICE_BLOCK_DOMAIN, async_block_domain, schema=DOMAIN_SCHEMA
+        )
+    if not hass.services.has_service(DOMAIN, SERVICE_ALLOW_DOMAIN):
+        hass.services.async_register(
+            DOMAIN, SERVICE_ALLOW_DOMAIN, async_allow_domain, schema=DOMAIN_SCHEMA
+        )
+    if not hass.services.has_service(DOMAIN, SERVICE_REMOVE_RULE):
+        hass.services.async_register(
+            DOMAIN, SERVICE_REMOVE_RULE, async_remove_rule, schema=DOMAIN_SCHEMA
+        )
 
     return True
 

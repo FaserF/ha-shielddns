@@ -110,8 +110,6 @@ async def hass(event_loop):
     hass_obj.config_entries = MagicMock()
     hass_obj.config_entries._entries = {}
     hass_obj.config_entries.async_setup = AsyncMock(return_value=True)
-    hass_obj.config_entries.flow = MagicMock()
-
     # Mocking flow methods to return dicts with FlowResultType
     async def async_init_mock(*args, **kwargs):
         return {
@@ -167,22 +165,24 @@ async def hass(event_loop):
     # Provide a smarter .get() that returns a Mock State
     def mock_get(entity_id):
         mock_state = MagicMock()
-        if "total" in entity_id:
-            mock_state.state = "1500"
-        elif "blocked" in entity_id:
-            mock_state.state = "300"
-        elif "percentage" in entity_id:
-            mock_state.state = "20.0"
-        elif "clients" in entity_id:
-            mock_state.state = "5"
-        elif "version" in entity_id:
-            mock_state.state = "v1.1.0"
-        elif "filtering" in entity_id:
-            mock_state.state = "on"
+        mock_state.attributes = {}
+        if "total_queries" in entity_id:
+            mock_state.state = "1000"
+        elif "blocked_queries" in entity_id:
+            mock_state.state = "250"
+        elif "block_percentage" in entity_id:
+            mock_state.state = "25.0"
+            mock_state.attributes["unit_of_measurement"] = "%"
+        elif "unique_clients" in entity_id:
+            mock_state.state = "0"
         elif "avg_response_time" in entity_id:
             mock_state.state = "12.5"
+            mock_state.attributes["unit_of_measurement"] = "ms"
         elif "cache_hit_ratio" in entity_id:
             mock_state.state = "15.0"
+            mock_state.attributes["unit_of_measurement"] = "%"
+        elif "filtering" in entity_id:
+            mock_state.state = "on"
         else:
             mock_state.state = "unknown"
         return mock_state

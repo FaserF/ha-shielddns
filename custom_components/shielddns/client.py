@@ -42,6 +42,11 @@ class ShieldDNSApiClient:
         schema = "https" if use_ssl else "http"
         self._base_url = f"{schema}://{host}:{port}/api"
 
+    @property
+    def use_ssl(self) -> bool:
+        """Return whether SSL is used."""
+        return self._use_ssl
+
     async def _api_wrapper(
         self,
         method: str,

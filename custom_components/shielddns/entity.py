@@ -27,7 +27,7 @@ class ShieldDNSEntity(CoordinatorEntity[ShieldDNSDataUpdateCoordinator]):
         version = self.coordinator.data.get("stats", {}).get("version", "Unknown")
         return DeviceInfo(
             identifiers={(DOMAIN, self.entry_id)},
-            name="ShieldDNS",
+            name=f"ShieldDNS ({self.coordinator.host})",
             manufacturer="ShieldDNS",
             sw_version=version,
             configuration_url=self.coordinator.admin_url,

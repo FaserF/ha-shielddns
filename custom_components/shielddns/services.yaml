@@ -3,6 +3,9 @@
 block_domain:
   name: Block Domain
   description: Instantly adds a domain to the ShieldDNS blocklist.
+  target:
+    entity:
+      integration: shielddns
   fields:
     domain:
       name: Domain
@@ -15,6 +18,9 @@ block_domain:
 allow_domain:
   name: Allow Domain
   description: Instantly adds a domain to the ShieldDNS allowlist (whitelist).
+  target:
+    entity:
+      integration: shielddns
   fields:
     domain:
       name: Domain
@@ -27,6 +33,9 @@ allow_domain:
 remove_rule:
   name: Remove Domain Rule
   description: Removes a domain from both the blocklist and allowlist.
+  target:
+    entity:
+      integration: shielddns
   fields:
     domain:
       name: Domain
