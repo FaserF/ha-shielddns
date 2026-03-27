@@ -111,6 +111,7 @@ async def hass(event_loop):
     hass_obj.config_entries._entries = {}
     hass_obj.config_entries.async_setup = AsyncMock(return_value=True)
     hass_obj.config_entries.flow = MagicMock()
+
     # Mocking flow methods to return dicts with FlowResultType
     async def async_init_mock(*args, **kwargs):
         return {
@@ -132,7 +133,8 @@ async def hass(event_loop):
         # If the test is specifically for invalid auth or cannot connect, return FORM
         # This is a hack because the mock replaces the real logic
         if user_input.get("token") == "test-token" and any(
-            patch_name in str(MagicMock()) for patch_name in ["AuthenticationError", "CommunicationError"]
+            patch_name in str(MagicMock())
+            for patch_name in ["AuthenticationError", "CommunicationError"]
         ):
             # This logic is hard to do here, but we can check for common test token
             # Actually, let's just make it return what the test expects by checking context?
@@ -224,7 +226,7 @@ async def fix_instance_methods(hass: HomeAssistant):
     def patched_create_task(target, name=None, **kwargs):
         try:
             return orig_create_task(target, name=name, **kwargs)
-        except (TypeError, AttributeError):
+        except TypeError, AttributeError:
             return current_loop.create_task(target)
 
     hass.async_create_task = patched_create_task
@@ -234,7 +236,7 @@ async def fix_instance_methods(hass: HomeAssistant):
     def patched_add_job(target, *args, **kwargs):
         try:
             return orig_add_job(target, *args, **kwargs)
-        except (TypeError, AttributeError):
+        except TypeError, AttributeError:
             if asyncio.iscoroutine(target) or asyncio.iscoroutinefunction(target):
                 return current_loop.create_task(target(*args))
             return current_loop.call_soon(target, *args)
