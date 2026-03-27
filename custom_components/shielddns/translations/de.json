@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Verbinde mit ShieldDNS",
-        "description": "Hilfe gibt es in der Dokumentation unter https://github.com/FaserF/ha-shielddns",
+        "description": "Hilfe gibt es in der Dokumentation unter {docs_url}",
         "data": {
           "host": "Host/IP-Adresse",
           "port": "Port",
@@ -20,6 +20,17 @@
     },
     "abort": {
       "already_configured": "Gerät ist bereits konfiguriert"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "ShieldDNS konfigurieren",
+        "data": {
+          "token": "API-Token",
+          "update_interval": "Update-Intervall (Minuten)"
+        }
+      }
     }
   },
   "entity": {
@@ -39,8 +50,11 @@
       "shielddns_version": {
         "name": "ShieldDNS Version"
       },
-      "coredns_version": {
-        "name": "CoreDNS Version"
+      "avg_response_time": {
+        "name": "Durchschn. Antwortzeit"
+      },
+      "cache_hit_ratio": {
+        "name": "Cache-Trefferrate"
       }
     },
     "switch": {

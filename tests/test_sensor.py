@@ -61,3 +61,15 @@ async def test_sensors(hass: HomeAssistant) -> None:
     state = hass.states.get("sensor.shielddns_shielddns_version")
     assert state
     assert state.state == "v1.1.0"
+
+    # Avg. Response Time
+    state = hass.states.get("sensor.shielddns_avg_response_time")
+    assert state
+    assert state.state == "12.5"
+    assert state.attributes.get("unit_of_measurement") == "ms"
+
+    # Cache Hit Ratio
+    state = hass.states.get("sensor.shielddns_cache_hit_ratio")
+    assert state
+    assert state.state == "15.0"
+    assert state.attributes.get("unit_of_measurement") == "%"

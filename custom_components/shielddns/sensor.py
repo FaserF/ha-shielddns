@@ -33,7 +33,13 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL,
         value_fn=lambda data: (
             stats := data.get("stats", {}),
-            stats.get("total_queries", stats.get("TotalQueries", stats.get("queries_today", stats.get("QueriesToday", 0)))),
+            stats.get(
+                "total_queries",
+                stats.get(
+                    "TotalQueries",
+                    stats.get("queries_today", stats.get("QueriesToday", 0)),
+                ),
+            ),
         )[-1],
     ),
     ShieldDNSSensorEntityDescription(
@@ -43,7 +49,13 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL,
         value_fn=lambda data: (
             stats := data.get("stats", {}),
-            stats.get("blocked_queries", stats.get("BlockedQueries", stats.get("blocked_today", stats.get("BlockedToday", 0)))),
+            stats.get(
+                "blocked_queries",
+                stats.get(
+                    "BlockedQueries",
+                    stats.get("blocked_today", stats.get("BlockedToday", 0)),
+                ),
+            ),
         )[-1],
     ),
     ShieldDNSSensorEntityDescription(
@@ -54,8 +66,20 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda data: (
             stats := data.get("stats", {}),
-            total := stats.get("total_queries", stats.get("TotalQueries", stats.get("queries_today", stats.get("QueriesToday", 0)))),
-            blocked := stats.get("blocked_queries", stats.get("BlockedQueries", stats.get("blocked_today", stats.get("BlockedToday", 0)))),
+            total := stats.get(
+                "total_queries",
+                stats.get(
+                    "TotalQueries",
+                    stats.get("queries_today", stats.get("QueriesToday", 0)),
+                ),
+            ),
+            blocked := stats.get(
+                "blocked_queries",
+                stats.get(
+                    "BlockedQueries",
+                    stats.get("blocked_today", stats.get("BlockedToday", 0)),
+                ),
+            ),
             round((blocked / total * 100), 1) if total > 0 else 0.0,
         )[-1],
     ),
@@ -70,12 +94,33 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         )[-1],
     ),
     ShieldDNSSensorEntityDescription(
-        key="coredns_version",
-        translation_key="coredns_version",
-        icon="mdi:dns",
+        key="avg_response_time",
+        translation_key="avg_response_time",
+        icon="mdi:timer-outline",
+        native_unit_of_measurement="ms",
+        state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda data: (
             stats := data.get("stats", {}),
-            stats.get("coredns_version", stats.get("CoreDNSVersion", "Unknown")),
+            stats.get("average_latency", 0.0),
+        )[-1],
+    ),
+    ShieldDNSSensorEntityDescription(
+        key="cache_hit_ratio",
+        translation_key="cache_hit_ratio",
+        icon="mdi:database-check",
+        native_unit_of_measurement="%",
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda data: (
+            stats := data.get("stats", {}),
+            total := stats.get(
+                "total_queries",
+                stats.get(
+                    "TotalQueries",
+                    stats.get("queries_today", stats.get("QueriesToday", 0)),
+                ),
+            ),
+            hits := stats.get("cache_hits", 0),
+            round((hits / total * 100), 1) if total > 0 else 0.0,
         )[-1],
     ),
 )

@@ -12,8 +12,10 @@ from .const import (
     CONF_HOST,
     CONF_PORT,
     CONF_TOKEN,
+    CONF_UPDATE_INTERVAL,
     CONF_USE_SSL,
     CONF_VERIFY_SSL,
+    DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
 )
 from .coordinator import ShieldDNSDataUpdateCoordinator
@@ -39,18 +41,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     client = ShieldDNSApiClient(
         host,
         port,
-        entry.data[CONF_TOKEN],
+        entry.options.get(CONF_TOKEN, entry.data.get(CONF_TOKEN)),
         session=session,
         use_ssl=entry.data.get(CONF_USE_SSL, True),
         verify_ssl=entry.data.get(CONF_VERIFY_SSL, True),
     )
 
-    coordinator = ShieldDNSDataUpdateCoordinator(hass, client, host, port)
+    update_interval = entry.options.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
+    coordinator = ShieldDNSDataUpdateCoordinator(
+        hass, client, host, port, update_interval
+    )
     await coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    entry.async_on_unload(entry.add_update_listener(async_update_options))
 
     # Register Services
     async def async_block_domain(call: ServiceCall) -> None:
@@ -92,3 +99,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.services.async_remove(DOMAIN, SERVICE_REMOVE_RULE)
 
     return unload_ok
+
+
+async def async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Update options."""
+    await hass.config_entries.async_reload(entry.entry_id)

@@ -4,7 +4,7 @@ from typing import Any
 
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
@@ -17,9 +17,11 @@ from .const import (
     CONF_HOST,
     CONF_PORT,
     CONF_TOKEN,
+    CONF_UPDATE_INTERVAL,
     CONF_USE_SSL,
     CONF_VERIFY_SSL,
     DEFAULT_PORT,
+    DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
 )
 
@@ -75,5 +77,53 @@ class ShieldDNSConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(title=info["title"], data=user_input)
 
         return self.async_show_form(
-            step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
+            step_id="user",
+            data_schema=STEP_USER_DATA_SCHEMA,
+            errors=errors,
+            description_placeholders={
+                "docs_url": "https://github.com/FaserF/ha-shielddns"
+            },
+        )
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(
+        config_entry: config_entries.ConfigEntry,
+    ) -> config_entries.OptionsFlow:
+        """Create the options flow."""
+        return ShieldDNSOptionsFlowHandler(config_entry)
+
+
+class ShieldDNSOptionsFlowHandler(config_entries.OptionsFlow):
+    """Handle an options flow for ShieldDNS."""
+
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        """Initialize options flow."""
+        self.config_entry = config_entry
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Manage the options."""
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_TOKEN,
+                        default=self.config_entry.options.get(
+                            CONF_TOKEN, self.config_entry.data.get(CONF_TOKEN)
+                        ),
+                    ): str,
+                    vol.Required(
+                        CONF_UPDATE_INTERVAL,
+                        default=self.config_entry.options.get(
+                            CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
+                        ),
+                    ): vol.All(vol.Coerce(int), vol.Range(min=1)),
+                }
+            ),
         )

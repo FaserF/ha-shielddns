@@ -7,7 +7,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .client import ShieldDNSApiClient, ShieldDNSApiClientError
-from .const import DOMAIN, LOGGER, UPDATE_INTERVAL
+from .const import DOMAIN, LOGGER
 
 
 class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
@@ -19,6 +19,7 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         client: ShieldDNSApiClient,
         host: str,
         port: int,
+        update_interval: int,
     ) -> None:
         """Initialize."""
         self.client = client
@@ -28,7 +29,7 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             hass,
             LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(seconds=UPDATE_INTERVAL),
+            update_interval=timedelta(minutes=update_interval),
         )
 
     @property
