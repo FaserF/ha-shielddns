@@ -28,7 +28,7 @@ jobs:
     if: ${{ always() && github.event_name == 'pull_request' }}
     needs: [lint, test, build]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Auto-merge Green PRs
         if: ${{ needs.lint.result == 'success' && needs.test.result == 'success' && needs.build.result == 'success' && (github.event.pull_request.user.login == 'FaserF' || github.event.pull_request.user.type == 'Bot') }}
