@@ -31,20 +31,24 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         translation_key="total_queries",
         icon="mdi:help-network",
         state_class=SensorStateClass.TOTAL,
-        value_fn=lambda data: data.get("stats", {}).get("TotalQueries")
-        or data.get("stats", {}).get("total_queries")
-        or data.get("stats", {}).get("QueriesToday")
-        or data.get("stats", {}).get("queries_today", 0),
+        value_fn=lambda data: (
+            data.get("stats", {}).get("TotalQueries")
+            or data.get("stats", {}).get("total_queries")
+            or data.get("stats", {}).get("QueriesToday")
+            or data.get("stats", {}).get("queries_today", 0)
+        ),
     ),
     ShieldDNSSensorEntityDescription(
         key="blocked_queries",
         translation_key="blocked_queries",
         icon="mdi:shield-alert",
         state_class=SensorStateClass.TOTAL,
-        value_fn=lambda data: data.get("stats", {}).get("BlockedQueries")
-        or data.get("stats", {}).get("blocked_queries")
-        or data.get("stats", {}).get("BlockedToday")
-        or data.get("stats", {}).get("blocked_today", 0),
+        value_fn=lambda data: (
+            data.get("stats", {}).get("BlockedQueries")
+            or data.get("stats", {}).get("blocked_queries")
+            or data.get("stats", {}).get("BlockedToday")
+            or data.get("stats", {}).get("blocked_today", 0)
+        ),
     ),
     ShieldDNSSensorEntityDescription(
         key="block_percentage",
@@ -54,8 +58,14 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda data: round(
             (
-                (data.get("stats", {}).get("BlockedQueries", 0) or data.get("stats", {}).get("blocked_queries", 0))
-                / (data.get("stats", {}).get("TotalQueries", 1) or data.get("stats", {}).get("total_queries", 1))
+                (
+                    data.get("stats", {}).get("BlockedQueries", 0)
+                    or data.get("stats", {}).get("blocked_queries", 0)
+                )
+                / (
+                    data.get("stats", {}).get("TotalQueries", 1)
+                    or data.get("stats", {}).get("total_queries", 1)
+                )
                 * 100
             ),
             1,
@@ -66,8 +76,10 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         translation_key="unique_clients",
         icon="mdi:lan",
         state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda data: data.get("stats", {}).get("UniqueClients")
-        or data.get("stats", {}).get("unique_clients", 0),
+        value_fn=lambda data: (
+            data.get("stats", {}).get("UniqueClients")
+            or data.get("stats", {}).get("unique_clients", 0)
+        ),
     ),
     ShieldDNSSensorEntityDescription(
         key="avg_response_time",
@@ -75,7 +87,9 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         icon="mdi:timer-outline",
         native_unit_of_measurement="ms",
         state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda data: round(data.get("stats", {}).get("average_latency", 0.0), 2),
+        value_fn=lambda data: round(
+            data.get("stats", {}).get("average_latency", 0.0), 2
+        ),
     ),
     ShieldDNSSensorEntityDescription(
         key="cache_hit_ratio",
@@ -86,7 +100,10 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         value_fn=lambda data: round(
             (
                 data.get("stats", {}).get("cache_hits", 0)
-                / (data.get("stats", {}).get("TotalQueries", 1) or data.get("stats", {}).get("total_queries", 1))
+                / (
+                    data.get("stats", {}).get("TotalQueries", 1)
+                    or data.get("stats", {}).get("total_queries", 1)
+                )
                 * 100
             ),
             1,

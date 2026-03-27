@@ -110,6 +110,7 @@ async def hass(event_loop):
     hass_obj.config_entries = MagicMock()
     hass_obj.config_entries._entries = {}
     hass_obj.config_entries.async_setup = AsyncMock(return_value=True)
+
     # Mocking flow methods to return dicts with FlowResultType
     async def async_init_mock(*args, **kwargs):
         return {
