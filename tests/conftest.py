@@ -68,7 +68,7 @@ class MockConfigEntry(ce.ConfigEntry):
             unique_id=uuid.uuid4().hex,
             version=version,
         )
-        self.state = ce.ConfigEntryState.SETUP_IN_PROGRESS
+        object.__setattr__(self, "state", ce.ConfigEntryState.SETUP_IN_PROGRESS)
 
     def add_to_hass(self, hass: HomeAssistant) -> None:
         """Add entry to hass."""
