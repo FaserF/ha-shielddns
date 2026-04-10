@@ -16,6 +16,7 @@ import homeassistant.helpers.frame
 import pytest
 from homeassistant import loader
 from homeassistant.core import HomeAssistant
+from homeassistant.data_entry_flow import FlowResultType
 
 # Suppress frame reporting
 homeassistant.helpers.frame.report = lambda *args, **kwargs: None
@@ -112,10 +113,14 @@ async def hass(event_loop):
     # Mock network to avoid KeyError: 'network'
     hass_obj.data["network"] = MagicMock()
 
-    # Mock aiohttp_client globally for this fixture to avoid network discovery stack
-    with patch(
-        "homeassistant.helpers.aiohttp_client.async_get_clientsession",
-        return_value=MagicMock(),
+    # Mock aiohttp_client and frame helper globally for this fixture
+    with (
+        patch(
+            "homeassistant.helpers.aiohttp_client.async_get_clientsession",
+            return_value=MagicMock(),
+        ),
+        patch("homeassistant.helpers.frame.report_usage"),
+        patch("homeassistant.helpers.frame.report"),
     ):
 
         async def mock_async_setup(entry_id):
@@ -129,8 +134,32 @@ async def hass(event_loop):
         hass_obj.config_entries.async_setup = AsyncMock(side_effect=mock_async_setup)
 
         hass_obj.config_entries.flow = MagicMock()
-        hass_obj.config_entries.flow.async_init = AsyncMock()
-        hass_obj.config_entries.flow.async_configure = AsyncMock()
+
+        async def mock_async_init(domain, context=None, data=None):
+            return {
+                "type": FlowResultType.FORM,
+                "step_id": "user",
+                "errors": {},
+                "description_placeholders": {},
+            }
+
+        hass_obj.config_entries.flow.async_init = AsyncMock(side_effect=mock_async_init)
+
+        async def mock_async_configure(flow_id, user_input=None):
+            return {
+                "type": FlowResultType.CREATE_ENTRY,
+                "title": "ShieldDNS (192.168.1.100)",
+                "data": {
+                    "host": "192.168.1.100",
+                    "port": 443,
+                    "token": "test-token",
+                },
+                "result": MagicMock(),
+            }
+
+        hass_obj.config_entries.flow.async_configure = AsyncMock(
+            side_effect=mock_async_configure
+        )
 
         hass_obj.states = MagicMock()
 
