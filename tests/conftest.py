@@ -109,13 +109,21 @@ async def hass(event_loop):
     # Setup minimal attributes
     hass_obj.config_entries = MagicMock()
     hass_obj.config_entries._entries = {}
-    hass_obj.config_entries.async_setup = AsyncMock(return_value=True)
+    async def mock_async_setup(entry_id):
+        from custom_components.shielddns import async_setup_entry
+
+        entry = hass_obj.config_entries._entries.get(entry_id)
+        if entry:
+            return await async_setup_entry(hass_obj, entry)
+        return True
+
+    hass_obj.config_entries.async_setup = AsyncMock(side_effect=mock_async_setup)
 
     hass_obj.config_entries.flow = MagicMock()
+    # Minimal flow registry
+    _flows = {}
 
-    # Mocking flow methods to return dicts with FlowResultType
-    async def async_init_mock(*args, **kwargs):
-        """Mock async_init."""
+    async def mock_async_init(domain, context=None, data=None):
         return {
             "type": FlowResultType.FORM,
             "step_id": "user",
@@ -123,10 +131,9 @@ async def hass(event_loop):
             "description_placeholders": {},
         }
 
-    hass_obj.config_entries.flow.async_init = AsyncMock(side_effect=async_init_mock)
+    hass_obj.config_entries.flow.async_init = AsyncMock(side_effect=mock_async_init)
 
-    async def async_configure_mock(*args, **kwargs):
-        """Mock async_configure."""
+    async def mock_async_configure(flow_id, user_input=None):
         return {
             "type": FlowResultType.CREATE_ENTRY,
             "title": "ShieldDNS (192.168.1.100)",
@@ -139,7 +146,7 @@ async def hass(event_loop):
         }
 
     hass_obj.config_entries.flow.async_configure = AsyncMock(
-        side_effect=async_configure_mock
+        side_effect=mock_async_configure
     )
 
     hass_obj.states = MagicMock()
@@ -153,15 +160,15 @@ async def hass(event_loop):
         elif "blocked_queries" in entity_id:
             mock_state.state = "250"
         elif "block_percentage" in entity_id:
-            mock_state.state = "25.0"
+            mock_state.state = "25"
             mock_state.attributes["unit_of_measurement"] = "%"
         elif "unique_clients" in entity_id:
             mock_state.state = "0"
         elif "avg_response_time" in entity_id:
-            mock_state.state = "12.5"
+            mock_state.state = "13"
             mock_state.attributes["unit_of_measurement"] = "ms"
         elif "cache_hit_ratio" in entity_id:
-            mock_state.state = "15.0"
+            mock_state.state = "15"
             mock_state.attributes["unit_of_measurement"] = "%"
         elif "filtering" in entity_id:
             mock_state.state = "on"
@@ -172,8 +179,35 @@ async def hass(event_loop):
     hass_obj.states.get = MagicMock(side_effect=mock_get)
 
     hass_obj.services = MagicMock()
-    hass_obj.services.async_call = AsyncMock()
-    hass_obj.services.has_service = MagicMock(return_value=True)
+    _services = {}
+
+    async def mock_async_call(
+        domain, service, service_data=None, blocking=False, **kwargs
+    ):
+        if (domain, service) in _services:
+            from homeassistant.core import ServiceCall
+
+            await _services[(domain, service)](
+                ServiceCall(domain, service, service_data or {})
+            )
+
+    hass_obj.services.async_call = AsyncMock(side_effect=mock_async_call)
+
+    def mock_async_register(domain, service, service_func, schema=None):
+        _services[(domain, service)] = service_func
+
+    hass_obj.services.async_register = MagicMock(side_effect=mock_async_register)
+
+    # has_service should return True for our known services or registered ones
+    def mock_has_service(domain, service):
+        return (domain, service) in _services or domain in [
+            "shielddns",
+            "button",
+            "switch",
+            "sensor",
+        ]
+
+    hass_obj.services.has_service = MagicMock(side_effect=mock_has_service)
 
     hass_obj.data = {}
 

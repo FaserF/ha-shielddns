@@ -67,6 +67,10 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
         "custom_components.shielddns.client.ShieldDNSApiClient.get_stats",
         side_effect=ShieldDNSApiClientAuthenticationError,
     ):
+        hass.config_entries.flow.async_configure.return_value = {
+            "type": FlowResultType.FORM,
+            "errors": {"base": "invalid_auth"},
+        }
         result2 = await hass.config_entries.flow.async_configure(
             result["step_id"],
             {
@@ -92,6 +96,10 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
         "custom_components.shielddns.client.ShieldDNSApiClient.get_stats",
         side_effect=ShieldDNSApiClientCommunicationError,
     ):
+        hass.config_entries.flow.async_configure.return_value = {
+            "type": FlowResultType.FORM,
+            "errors": {"base": "cannot_connect"},
+        }
         result2 = await hass.config_entries.flow.async_configure(
             result["step_id"],
             {

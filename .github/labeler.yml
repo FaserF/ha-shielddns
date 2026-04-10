@@ -1,0 +1,14 @@
+# Configuration for actions/labeler
+
+integration:
+  - custom_components/**/*
+
+test:
+  - tests/**/*
+
+ci:
+  - .github/**/*
+
+docs:
+  - README.md
+  - docs/**/*

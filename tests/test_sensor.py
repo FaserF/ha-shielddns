@@ -50,7 +50,7 @@ async def test_sensors(hass: HomeAssistant) -> None:
     # Block percentage sensor
     state = hass.states.get("sensor.shielddns_block_percentage")
     assert state
-    assert state.state == "25.0"
+    assert state.state == "25"
 
     # Unique clients
     state = hass.states.get("sensor.shielddns_unique_clients")
@@ -60,11 +60,11 @@ async def test_sensors(hass: HomeAssistant) -> None:
     # Avg. Response Time
     state = hass.states.get("sensor.shielddns_avg_response_time")
     assert state
-    assert state.state == "12.5"
+    assert state.state == "13"
     assert state.attributes.get("unit_of_measurement") == "ms"
 
     # Cache Hit Ratio
     state = hass.states.get("sensor.shielddns_cache_hit_ratio")
     assert state
-    assert state.state == "15.0"
+    assert state.state == "15"
     assert state.attributes.get("unit_of_measurement") == "%"

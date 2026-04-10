@@ -25,6 +25,9 @@ jobs:
   pr-janitor:
     name: PR Assistant
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     if: ${{ always() && github.event_name == 'pull_request' }}
     needs: [lint, test, build]
     steps:
