@@ -23,7 +23,7 @@ homeassistant.helpers.frame.report = lambda *args, **kwargs: None
 
 # Compatibility patch for ConfigFlowResult
 if not hasattr(homeassistant.config_entries, "ConfigFlowResult"):
-    homeassistant.config_entries.ConfigFlowResult = Any
+    homeassistant.config_entries.ConfigFlowResult = Any  # type: ignore
 
 # MockConfigEntry and Plugin mocking
 INSTANCES = []
@@ -109,6 +109,7 @@ async def hass(event_loop):
     # Setup minimal attributes
     hass_obj.config_entries = MagicMock()
     hass_obj.config_entries._entries = {}
+
     async def mock_async_setup(entry_id):
         from custom_components.shielddns import async_setup_entry
 
@@ -245,7 +246,7 @@ async def fix_instance_methods(hass: HomeAssistant):
         except TypeError, AttributeError:
             return current_loop.create_task(target)
 
-    hass.async_create_task = patched_create_task
+    hass.async_create_task = patched_create_task  # type: ignore
 
     orig_add_job = getattr(hass, "async_add_job", MagicMock())
 
@@ -257,7 +258,7 @@ async def fix_instance_methods(hass: HomeAssistant):
                 return current_loop.create_task(target(*args))
             return current_loop.call_soon(target, *args)
 
-    hass.async_add_job = patched_add_job
+    hass.async_add_job = patched_add_job  # type: ignore
 
 
 @pytest.fixture(scope="session", autouse=True)

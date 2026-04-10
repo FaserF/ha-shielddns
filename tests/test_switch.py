@@ -69,6 +69,7 @@ async def test_switch(hass: HomeAssistant) -> None:
         )
         mock_toggle.assert_called_once_with(False)
         state = hass.states.get(entity_id)
+        assert state
         assert state.state == "off"
 
     # Test turning on
@@ -93,4 +94,5 @@ async def test_switch(hass: HomeAssistant) -> None:
         )
         mock_toggle.assert_called_once_with(True)
         state = hass.states.get(entity_id)
+        assert state
         assert state.state == "on"
