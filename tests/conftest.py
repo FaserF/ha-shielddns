@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from types import ModuleType
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import homeassistant.config_entries
 import homeassistant.core as ha
@@ -16,7 +16,6 @@ import homeassistant.helpers.frame
 import pytest
 from homeassistant import loader
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
 
 # Suppress frame reporting
 homeassistant.helpers.frame.report = lambda *args, **kwargs: None
