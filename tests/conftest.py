@@ -110,6 +110,16 @@ async def hass(event_loop):
     hass_obj.config_entries = MagicMock()
     hass_obj.config_entries._entries = {}
 
+    # Mock network to avoid KeyError: 'network'
+    hass_obj.data["network"] = MagicMock()
+
+    # Mock aiohttp_client to avoid network discovery stack
+    with patch(
+        "homeassistant.helpers.aiohttp_client.async_get_clientsession",
+        return_value=MagicMock(),
+    ):
+        pass
+
     async def mock_async_setup(entry_id):
         from custom_components.shielddns import async_setup_entry
 
@@ -121,34 +131,6 @@ async def hass(event_loop):
     hass_obj.config_entries.async_setup = AsyncMock(side_effect=mock_async_setup)
 
     hass_obj.config_entries.flow = MagicMock()
-    # Minimal flow registry
-    _flows = {}
-
-    async def mock_async_init(domain, context=None, data=None):
-        return {
-            "type": FlowResultType.FORM,
-            "step_id": "user",
-            "errors": {},
-            "description_placeholders": {},
-        }
-
-    hass_obj.config_entries.flow.async_init = AsyncMock(side_effect=mock_async_init)
-
-    async def mock_async_configure(flow_id, user_input=None):
-        return {
-            "type": FlowResultType.CREATE_ENTRY,
-            "title": "ShieldDNS (192.168.1.100)",
-            "data": {
-                "host": "192.168.1.100",
-                "port": 443,
-                "token": "test-token",
-            },
-            "result": MagicMock(),
-        }
-
-    hass_obj.config_entries.flow.async_configure = AsyncMock(
-        side_effect=mock_async_configure
-    )
 
     hass_obj.states = MagicMock()
 
@@ -211,11 +193,6 @@ async def hass(event_loop):
     hass_obj.services.has_service = MagicMock(side_effect=mock_has_service)
 
     hass_obj.data = {}
-
-    async def async_block_till_done_mock():
-        pass
-
-    hass_obj.async_block_till_done = async_block_till_done_mock
 
     yield hass_obj
 

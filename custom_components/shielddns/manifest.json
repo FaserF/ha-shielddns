@@ -1,7 +1,9 @@
 {
   "domain": "shielddns",
   "name": "ShieldDNS",
-  "codeowners": ["@FaserF"],
+  "codeowners": [
+    "@FaserF"
+  ],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/FaserF/ha-shielddns",
