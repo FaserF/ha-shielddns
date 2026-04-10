@@ -90,6 +90,7 @@ sys.modules["pytest_homeassistant_custom_component.common"] = _mock_phcc_common
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def event_loop():
     """Create a fresh event loop for each test."""
@@ -188,9 +189,7 @@ async def hass(event_loop: asyncio.AbstractEventLoop) -> Any:
         side_effect=lambda d, s, fn, schema=None: _services.update({(d, s): fn})
     )
     hass_obj.services.async_remove = MagicMock()
-    hass_obj.services.has_service = MagicMock(
-        side_effect=lambda d, s: True
-    )
+    hass_obj.services.has_service = MagicMock(side_effect=lambda d, s: True)
 
     # async_block_till_done is a no-op in tests
     hass_obj.async_block_till_done = AsyncMock()
