@@ -112,88 +112,87 @@ async def hass(event_loop):
     # Mock network to avoid KeyError: 'network'
     hass_obj.data["network"] = MagicMock()
 
-    # Mock aiohttp_client to avoid network discovery stack
+    # Mock aiohttp_client globally for this fixture to avoid network discovery stack
     with patch(
         "homeassistant.helpers.aiohttp_client.async_get_clientsession",
         return_value=MagicMock(),
     ):
-        pass
 
-    async def mock_async_setup(entry_id):
-        from custom_components.shielddns import async_setup_entry
+        async def mock_async_setup(entry_id):
+            from custom_components.shielddns import async_setup_entry
 
-        entry = hass_obj.config_entries._entries.get(entry_id)
-        if entry:
-            return await async_setup_entry(hass_obj, entry)
-        return True
+            entry = hass_obj.config_entries._entries.get(entry_id)
+            if entry:
+                return await async_setup_entry(hass_obj, entry)
+            return True
 
-    hass_obj.config_entries.async_setup = AsyncMock(side_effect=mock_async_setup)
+        hass_obj.config_entries.async_setup = AsyncMock(side_effect=mock_async_setup)
 
-    hass_obj.config_entries.flow = MagicMock()
+        hass_obj.config_entries.flow = MagicMock()
+        hass_obj.config_entries.flow.async_init = AsyncMock()
+        hass_obj.config_entries.flow.async_configure = AsyncMock()
 
-    hass_obj.states = MagicMock()
+        hass_obj.states = MagicMock()
 
-    # Provide a smarter .get() that returns a Mock State
-    def mock_get(entity_id):
-        mock_state = MagicMock()
-        mock_state.attributes = {}
-        if "total_queries" in entity_id:
-            mock_state.state = "1000"
-        elif "blocked_queries" in entity_id:
-            mock_state.state = "250"
-        elif "block_percentage" in entity_id:
-            mock_state.state = "25"
-            mock_state.attributes["unit_of_measurement"] = "%"
-        elif "unique_clients" in entity_id:
-            mock_state.state = "0"
-        elif "avg_response_time" in entity_id:
-            mock_state.state = "13"
-            mock_state.attributes["unit_of_measurement"] = "ms"
-        elif "cache_hit_ratio" in entity_id:
-            mock_state.state = "15"
-            mock_state.attributes["unit_of_measurement"] = "%"
-        elif "filtering" in entity_id:
-            mock_state.state = "on"
-        else:
-            mock_state.state = "unknown"
-        return mock_state
+        # Provide a smarter .get() that returns a Mock State
+        def mock_get(entity_id):
+            mock_state = MagicMock()
+            mock_state.attributes = {}
+            if "total_queries" in entity_id:
+                mock_state.state = "1000"
+            elif "blocked_queries" in entity_id:
+                mock_state.state = "250"
+            elif "block_percentage" in entity_id:
+                mock_state.state = "25"
+                mock_state.attributes["unit_of_measurement"] = "%"
+            elif "unique_clients" in entity_id:
+                mock_state.state = "0"
+            elif "avg_response_time" in entity_id:
+                mock_state.state = "13"
+                mock_state.attributes["unit_of_measurement"] = "ms"
+            elif "cache_hit_ratio" in entity_id:
+                mock_state.state = "15"
+                mock_state.attributes["unit_of_measurement"] = "%"
+            elif "filtering" in entity_id:
+                mock_state.state = "on"
+            else:
+                mock_state.state = "unknown"
+            return mock_state
 
-    hass_obj.states.get = MagicMock(side_effect=mock_get)
+        hass_obj.states.get = MagicMock(side_effect=mock_get)
 
-    hass_obj.services = MagicMock()
-    _services = {}
+        hass_obj.services = MagicMock()
+        _services = {}
 
-    async def mock_async_call(
-        domain, service, service_data=None, blocking=False, **kwargs
-    ):
-        if (domain, service) in _services:
-            from homeassistant.core import ServiceCall
+        async def mock_async_call(
+            domain, service, service_data=None, blocking=False, **kwargs
+        ):
+            if (domain, service) in _services:
+                from homeassistant.core import ServiceCall
 
-            await _services[(domain, service)](
-                ServiceCall(domain, service, service_data or {})
-            )
+                await _services[(domain, service)](
+                    ServiceCall(domain, service, service_data or {})
+                )
 
-    hass_obj.services.async_call = AsyncMock(side_effect=mock_async_call)
+        hass_obj.services.async_call = AsyncMock(side_effect=mock_async_call)
 
-    def mock_async_register(domain, service, service_func, schema=None):
-        _services[(domain, service)] = service_func
+        def mock_async_register(domain, service, service_func, schema=None):
+            _services[(domain, service)] = service_func
 
-    hass_obj.services.async_register = MagicMock(side_effect=mock_async_register)
+        hass_obj.services.async_register = MagicMock(side_effect=mock_async_register)
 
-    # has_service should return True for our known services or registered ones
-    def mock_has_service(domain, service):
-        return (domain, service) in _services or domain in [
-            "shielddns",
-            "button",
-            "switch",
-            "sensor",
-        ]
+        # has_service should return True for our known services or registered ones
+        def mock_has_service(domain, service):
+            return (domain, service) in _services or domain in [
+                "shielddns",
+                "button",
+                "switch",
+                "sensor",
+            ]
 
-    hass_obj.services.has_service = MagicMock(side_effect=mock_has_service)
+        hass_obj.services.has_service = MagicMock(side_effect=mock_has_service)
 
-    hass_obj.data = {}
-
-    yield hass_obj
+        yield hass_obj
 
 
 @pytest.fixture(autouse=True)
