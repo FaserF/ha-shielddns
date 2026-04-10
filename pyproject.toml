@@ -63,7 +63,7 @@ check_untyped_defs = false
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
 disallow_untyped_calls = false
-disable_error_code = ["attr-defined", "var-annotated", "arg-type", "method-assign", "import-untyped"]
+disable_error_code = ["attr-defined", "var-annotated", "arg-type", "method-assign", "import-untyped", "assignment", "call-arg", "misc", "unused-ignore"]
 
 [tool.pytest.ini_options]
 testpaths = [

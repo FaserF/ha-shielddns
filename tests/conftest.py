@@ -1,7 +1,6 @@
 """conftest for shielddns tests."""
 
 import asyncio
-import contextvars
 import sys
 import uuid
 from concurrent.futures import ThreadPoolExecutor
@@ -10,288 +9,246 @@ from types import ModuleType
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import homeassistant.config_entries
-import homeassistant.core as ha
+import homeassistant.config_entries as ce
 import homeassistant.helpers.frame
 import pytest
 from homeassistant import loader
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
 
-# Suppress frame reporting
+# ---------------------------------------------------------------------------
+# Suppress frame reporting globally at import time so it never triggers
+# ---------------------------------------------------------------------------
 homeassistant.helpers.frame.report = lambda *args, **kwargs: None
 
-# Compatibility patch for ConfigFlowResult
-if not hasattr(homeassistant.config_entries, "ConfigFlowResult"):
-    homeassistant.config_entries.ConfigFlowResult = Any  # type: ignore
+_frame_report_usage_patcher = patch(
+    "homeassistant.helpers.frame.report_usage",
+    new=MagicMock(),
+)
+_frame_report_usage_patcher.start()
 
-# MockConfigEntry and Plugin mocking
-INSTANCES = []
+# Suppress zeroconf usage check as well
+_zeroconf_usage_patcher = patch(
+    "homeassistant.components.zeroconf.usage.report_usage",
+    new=MagicMock(),
+)
+try:
+    _zeroconf_usage_patcher.start()
+except Exception:
+    pass
 
 
-class MockConfigEntry:
-    """Mock Config Entry."""
+# ---------------------------------------------------------------------------
+# MockConfigEntry – inherits from the real ConfigEntry so isinstance() checks
+# inside DataUpdateCoordinator / async_config_entry_first_refresh pass.
+# ---------------------------------------------------------------------------
+class MockConfigEntry(ce.ConfigEntry):
+    """Minimal ConfigEntry for tests."""
 
     def __init__(
         self,
-        domain="shielddns",
-        data=None,
-        entry_id=None,
-        version=1,
-        title="ShieldDNS",
-        options=None,
-        **kwargs,
-    ):
-        self.domain = domain
-        self.data = data or {}
-        self.entry_id = entry_id or uuid.uuid4().hex
-        self.version = version
-        self.title = title
-        self.options = options or {}
-        self.state = "loaded"
-        self.unique_id = uuid.uuid4().hex
+        domain: str = "shielddns",
+        data: dict | None = None,
+        entry_id: str | None = None,
+        version: int = 1,
+        title: str = "ShieldDNS",
+        options: dict | None = None,
+        **kwargs: Any,
+    ) -> None:
+        # Build kwargs required by ConfigEntry.__init__
+        super().__init__(  # type: ignore[call-arg]
+            data=data or {},
+            domain=domain,
+            entry_id=entry_id or uuid.uuid4().hex,
+            minor_version=0,
+            options=options or {},
+            source=ce.SOURCE_USER,
+            title=title,
+            unique_id=uuid.uuid4().hex,
+            version=version,
+        )
 
-    def add_to_hass(self, hass):
+    def add_to_hass(self, hass: HomeAssistant) -> None:
         """Add entry to hass."""
-        if not hasattr(hass, "config_entries") or hass.config_entries is None:
-            hass.config_entries = MagicMock()
         if not hasattr(hass.config_entries, "_entries"):
             hass.config_entries._entries = {}
         hass.config_entries._entries[self.entry_id] = self
 
 
-# Inject Mock into sys.modules to satisfy imports in tests
-mock_mod = ModuleType("pytest_homeassistant_custom_component.common")
-mock_mod.MockConfigEntry = MockConfigEntry
-mock_mod.INSTANCES = INSTANCES
-if "pytest_homeassistant_custom_component" not in sys.modules:
-    sys.modules["pytest_homeassistant_custom_component"] = ModuleType(
-        "pytest_homeassistant_custom_component"
-    )
-sys.modules["pytest_homeassistant_custom_component.common"] = mock_mod
-
-# Patch _cv_hass
-if not hasattr(ha, "_cv_hass"):
-    ha._cv_hass = contextvars.ContextVar("cv_hass", default=None)
+# ---------------------------------------------------------------------------
+# Inject MockConfigEntry into the pytest-homeassistant-custom-component shim
+# ---------------------------------------------------------------------------
+INSTANCES: list[Any] = []
+_mock_phcc = ModuleType("pytest_homeassistant_custom_component")
+_mock_phcc_common = ModuleType("pytest_homeassistant_custom_component.common")
+_mock_phcc_common.MockConfigEntry = MockConfigEntry  # type: ignore[attr-defined, misc]
+_mock_phcc_common.INSTANCES = INSTANCES  # type: ignore[attr-defined, misc]
+sys.modules.setdefault("pytest_homeassistant_custom_component", _mock_phcc)
+sys.modules["pytest_homeassistant_custom_component.common"] = _mock_phcc_common
 
 
-# Patch HomeAssistant class EARLY
-def patched_hass_new(cls, *args, **kwargs):
-    return object.__new__(cls)
-
-
-HomeAssistant.__new__ = patched_hass_new
-
-_ORIG_HASS_INIT = HomeAssistant.__init__
-
-
-def patched_hass_init(self, config_dir="config", *args, **kwargs):
-    _ORIG_HASS_INIT(self, config_dir, *args, **kwargs)
-
-
-HomeAssistant.__init__ = patched_hass_init
+# ---------------------------------------------------------------------------
+# Fixtures
+# ---------------------------------------------------------------------------
 
 
 @pytest.fixture
 def event_loop():
-    """Create an instance of the default event loop for each test case."""
-    policy = asyncio.get_event_loop_policy()
-    loop = policy.new_event_loop()
+    """Create a fresh event loop for each test."""
+    loop = asyncio.new_event_loop()
     yield loop
+    loop.close()
 
 
 @pytest.fixture
-async def hass(event_loop):
-    """Fixture to provide a HomeAssistant instance."""
-    hass_obj = HomeAssistant()
-    hass_obj.loop = event_loop
+async def hass(event_loop: asyncio.AbstractEventLoop) -> Any:
+    """Provide a minimal HomeAssistant instance."""
 
-    # Setup minimal attributes
+    # Patch __new__ so HA skips its singleton guard
+    with patch.object(
+        HomeAssistant, "__new__", lambda cls, *a, **kw: object.__new__(cls)
+    ):
+        hass_obj = HomeAssistant.__new__(HomeAssistant)
+
+    # Minimal __init__
+    hass_obj.loop = event_loop
+    hass_obj.data: dict[str, Any] = {}  # type: ignore[assignment]
+    hass_obj.states = MagicMock()
+    hass_obj.bus = MagicMock()
+    hass_obj.components = MagicMock()
+    hass_obj.config = MagicMock()
     hass_obj.config_entries = MagicMock()
     hass_obj.config_entries._entries = {}
 
-    # Mock network to avoid KeyError: 'network'
+    # Pre-populate network key so aiohttp connector never reaches it
     hass_obj.data["network"] = MagicMock()
 
-    # Mock aiohttp_client and frame helper globally for this fixture
-    with (
-        patch(
-            "homeassistant.helpers.aiohttp_client.async_get_clientsession",
-            return_value=MagicMock(),
-        ),
-        patch("homeassistant.helpers.frame.report_usage"),
-        patch("homeassistant.helpers.frame.report"),
+    # States mock
+    def _mock_get(entity_id: str) -> MagicMock:
+        s = MagicMock()
+        s.attributes: dict[str, Any] = {}
+        mapping = {
+            "total_queries": ("1000", None),
+            "blocked_queries": ("250", None),
+            "block_percentage": ("25", "%"),
+            "unique_clients": ("0", None),
+            "avg_response_time": ("13", "ms"),
+            "cache_hit_ratio": ("15", "%"),
+            "filtering": ("on", None),
+        }
+        for key, (val, unit) in mapping.items():
+            if key in entity_id:
+                s.state = val
+                if unit:
+                    s.attributes["unit_of_measurement"] = unit
+                return s
+        s.state = "unknown"
+        return s
+
+    hass_obj.states.get = MagicMock(side_effect=_mock_get)
+
+    # Services mock with a real registry
+    hass_obj.services = MagicMock()
+    _services: dict[tuple[str, str], Any] = {}
+
+    async def _async_call(
+        domain: str,
+        service: str,
+        service_data: dict | None = None,
+        blocking: bool = False,
+        **kw: Any,
+    ) -> None:
+        if (domain, service) in _services:
+            from homeassistant.core import ServiceCall
+
+            await _services[(domain, service)](
+                ServiceCall(domain, service, service_data or {})
+            )
+
+    hass_obj.services.async_call = AsyncMock(side_effect=_async_call)
+    hass_obj.services.async_register = MagicMock(
+        side_effect=lambda d, s, fn, schema=None: _services.update({(d, s): fn})
+    )
+    hass_obj.services.async_remove = MagicMock()
+    hass_obj.services.has_service = MagicMock(
+        side_effect=lambda d, s: (d, s) in _services
+    )
+
+    # async_block_till_done is a no-op in tests
+    hass_obj.async_block_till_done = AsyncMock()
+
+    # config_entries.async_setup calls real async_setup_entry
+    async def _async_setup(entry_id: str) -> bool:
+        from custom_components.shielddns import async_setup_entry
+
+        entry = hass_obj.config_entries._entries.get(entry_id)
+        if entry:
+            return await async_setup_entry(hass_obj, entry)
+        return True
+
+    hass_obj.config_entries.async_setup = AsyncMock(side_effect=_async_setup)
+
+    # config_entries.async_forward_entry_setups is a no-op
+    hass_obj.config_entries.async_forward_entry_setups = AsyncMock(return_value=True)
+
+    # Flow mocks – plain AsyncMock so return_value can be set per-test
+    hass_obj.config_entries.flow = MagicMock()
+    hass_obj.config_entries.flow.async_init = AsyncMock(
+        return_value={
+            "type": "form",
+            "step_id": "user",
+            "errors": {},
+            "description_placeholders": {},
+        }
+    )
+    hass_obj.config_entries.flow.async_configure = AsyncMock(
+        return_value={
+            "type": "create_entry",
+            "title": "ShieldDNS (192.168.1.100)",
+            "data": {
+                "host": "192.168.1.100",
+                "port": 443,
+                "token": "test-token",
+            },
+            "result": MagicMock(),
+        }
+    )
+
+    # Patch aiohttp session so the zeroconf / DNS resolver chain is never hit
+    with patch(
+        "homeassistant.helpers.aiohttp_client.async_get_clientsession",
+        return_value=MagicMock(),
     ):
-
-        async def mock_async_setup(entry_id):
-            from custom_components.shielddns import async_setup_entry
-
-            entry = hass_obj.config_entries._entries.get(entry_id)
-            if entry:
-                return await async_setup_entry(hass_obj, entry)
-            return True
-
-        hass_obj.config_entries.async_setup = AsyncMock(side_effect=mock_async_setup)
-
-        hass_obj.config_entries.flow = MagicMock()
-
-        async def mock_async_init(domain, context=None, data=None):
-            return {
-                "type": FlowResultType.FORM,
-                "step_id": "user",
-                "errors": {},
-                "description_placeholders": {},
-            }
-
-        hass_obj.config_entries.flow.async_init = AsyncMock(side_effect=mock_async_init)
-
-        async def mock_async_configure(flow_id, user_input=None):
-            return {
-                "type": FlowResultType.CREATE_ENTRY,
-                "title": "ShieldDNS (192.168.1.100)",
-                "data": {
-                    "host": "192.168.1.100",
-                    "port": 443,
-                    "token": "test-token",
-                },
-                "result": MagicMock(),
-            }
-
-        hass_obj.config_entries.flow.async_configure = AsyncMock(
-            side_effect=mock_async_configure
-        )
-
-        hass_obj.states = MagicMock()
-
-        # Provide a smarter .get() that returns a Mock State
-        def mock_get(entity_id):
-            mock_state = MagicMock()
-            mock_state.attributes = {}
-            if "total_queries" in entity_id:
-                mock_state.state = "1000"
-            elif "blocked_queries" in entity_id:
-                mock_state.state = "250"
-            elif "block_percentage" in entity_id:
-                mock_state.state = "25"
-                mock_state.attributes["unit_of_measurement"] = "%"
-            elif "unique_clients" in entity_id:
-                mock_state.state = "0"
-            elif "avg_response_time" in entity_id:
-                mock_state.state = "13"
-                mock_state.attributes["unit_of_measurement"] = "ms"
-            elif "cache_hit_ratio" in entity_id:
-                mock_state.state = "15"
-                mock_state.attributes["unit_of_measurement"] = "%"
-            elif "filtering" in entity_id:
-                mock_state.state = "on"
-            else:
-                mock_state.state = "unknown"
-            return mock_state
-
-        hass_obj.states.get = MagicMock(side_effect=mock_get)
-
-        hass_obj.services = MagicMock()
-        _services = {}
-
-        async def mock_async_call(
-            domain, service, service_data=None, blocking=False, **kwargs
-        ):
-            if (domain, service) in _services:
-                from homeassistant.core import ServiceCall
-
-                await _services[(domain, service)](
-                    ServiceCall(domain, service, service_data or {})
-                )
-
-        hass_obj.services.async_call = AsyncMock(side_effect=mock_async_call)
-
-        def mock_async_register(domain, service, service_func, schema=None):
-            _services[(domain, service)] = service_func
-
-        hass_obj.services.async_register = MagicMock(side_effect=mock_async_register)
-
-        # has_service should return True for our known services or registered ones
-        def mock_has_service(domain, service):
-            return (domain, service) in _services or domain in [
-                "shielddns",
-                "button",
-                "switch",
-                "sensor",
-            ]
-
-        hass_obj.services.has_service = MagicMock(side_effect=mock_has_service)
-
         yield hass_obj
 
 
-@pytest.fixture(autouse=True)
-async def fix_instance_methods(hass: HomeAssistant):
-    """Fix methods that the plugin might have monkeypatched onto the instance."""
-    current_loop = asyncio.get_running_loop()
-    hass.loop = current_loop
-
-    async def async_stop_mock(*args, **kwargs):
-        while hass in INSTANCES:
-            INSTANCES.remove(hass)
-
-    hass.async_stop = async_stop_mock
-
-    def stop_mock(*args, **kwargs):
-        while hass in INSTANCES:
-            INSTANCES.remove(hass)
-
-    hass.stop = stop_mock
-
-    orig_create_task = getattr(hass, "async_create_task", MagicMock())
-
-    def patched_create_task(target, name=None, **kwargs):
-        try:
-            return orig_create_task(target, name=name, **kwargs)
-        except TypeError, AttributeError:
-            return current_loop.create_task(target)
-
-    hass.async_create_task = patched_create_task  # type: ignore
-
-    orig_add_job = getattr(hass, "async_add_job", MagicMock())
-
-    def patched_add_job(target, *args, **kwargs):
-        try:
-            return orig_add_job(target, *args, **kwargs)
-        except TypeError, AttributeError:
-            if asyncio.iscoroutine(target) or asyncio.iscoroutinefunction(target):
-                return current_loop.create_task(target(*args))
-            return current_loop.call_soon(target, *args)
-
-    hass.async_add_job = patched_add_job  # type: ignore
-
-
 @pytest.fixture(scope="session", autouse=True)
-def global_ha_patching():
-    """Apply global patches to HomeAssistant core for test stability."""
-    _SESSION_EXECUTOR = ThreadPoolExecutor(
-        max_workers=10, thread_name_prefix="waitpid-ha-test"
-    )
+def global_executor_patch() -> None:
+    """Replace async_add_executor_job with a loop-aware version."""
+    _exec = ThreadPoolExecutor(max_workers=4, thread_name_prefix="ha-test")
 
-    def patched_async_add_executor_job(self, target, *args):
+    def _patched(self: HomeAssistant, target: Any, *args: Any) -> Any:
         try:
             loop = asyncio.get_running_loop()
         except RuntimeError:
             loop = self.loop
-        return loop.run_in_executor(_SESSION_EXECUTOR, target, *args)
+        return loop.run_in_executor(_exec, target, *args)
 
-    HomeAssistant.async_add_executor_job = patched_async_add_executor_job
+    HomeAssistant.async_add_executor_job = _patched  # type: ignore[assignment, method-assign]
 
 
 @pytest.fixture(autouse=True)
 async def mock_integration_loading(hass: HomeAssistant) -> None:
-    """Ensure the shielddns integration is always found by the loader."""
+    """Ensure the shielddns integration is always found by the HA loader."""
     domain = "shielddns"
     path = Path("custom_components/shielddns")
-    hass.data.setdefault("custom_components", {})
-    hass.data.setdefault("integrations", {})
-    hass.data.setdefault("components", {})
-    hass.data.setdefault("preload_platforms", {})
-    hass.data.setdefault("missing_platforms", {})
+    for key in (
+        "custom_components",
+        "integrations",
+        "components",
+        "preload_platforms",
+        "missing_platforms",
+    ):
+        hass.data.setdefault(key, {})
 
     manifest = loader.Manifest(
         name="ShieldDNS",

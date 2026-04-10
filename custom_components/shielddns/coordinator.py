@@ -3,6 +3,7 @@
 from datetime import timedelta
 from typing import Any
 
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
@@ -16,6 +17,7 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     def __init__(
         self,
         hass: HomeAssistant,
+        config_entry: ConfigEntry,
         client: ShieldDNSApiClient,
         host: str,
         port: int,
@@ -28,6 +30,7 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         super().__init__(
             hass,
             LOGGER,
+            config_entry=config_entry,
             name=DOMAIN,
             update_interval=timedelta(minutes=update_interval),
         )
