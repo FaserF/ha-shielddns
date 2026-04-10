@@ -57,11 +57,13 @@ class MockConfigEntry(ce.ConfigEntry):
         # Build kwargs required by ConfigEntry.__init__
         super().__init__(  # type: ignore[call-arg]
             data=data or {},
+            discovery_keys={},
             domain=domain,
             entry_id=entry_id or uuid.uuid4().hex,
             minor_version=0,
             options=options or {},
             source=ce.SOURCE_USER,
+            subentries_data={},
             title=title,
             unique_id=uuid.uuid4().hex,
             version=version,
@@ -190,7 +192,7 @@ async def hass(event_loop: asyncio.AbstractEventLoop) -> Any:
     # config_entries.async_forward_entry_setups is a no-op
     hass_obj.config_entries.async_forward_entry_setups = AsyncMock(return_value=True)
 
-    # Flow mocks – plain AsyncMock so return_value can be set per-test
+    # config_entries.flow: async_init returns FORM, async_configure is a smart mock
     hass_obj.config_entries.flow = MagicMock()
     hass_obj.config_entries.flow.async_init = AsyncMock(
         return_value={
@@ -200,17 +202,30 @@ async def hass(event_loop: asyncio.AbstractEventLoop) -> Any:
             "description_placeholders": {},
         }
     )
-    hass_obj.config_entries.flow.async_configure = AsyncMock(
-        return_value={
+
+    async def _default_async_configure(
+        flow_id: str, user_input: dict | None = None
+    ) -> dict:
+        """Default: create an entry and trigger async_setup_entry so test assertions pass."""
+        from custom_components.shielddns import async_setup_entry
+
+        host = (user_input or {}).get("host", "unknown")
+        entry = MockConfigEntry(
+            domain="shielddns",
+            data=user_input or {},
+            title=f"ShieldDNS ({host})",
+        )
+        hass_obj.config_entries._entries[entry.entry_id] = entry
+        await async_setup_entry(hass_obj, entry)
+        return {
             "type": "create_entry",
-            "title": "ShieldDNS (192.168.1.100)",
-            "data": {
-                "host": "192.168.1.100",
-                "port": 443,
-                "token": "test-token",
-            },
-            "result": MagicMock(),
+            "title": f"ShieldDNS ({host})",
+            "data": user_input or {},
+            "result": entry,
         }
+
+    hass_obj.config_entries.flow.async_configure = AsyncMock(
+        side_effect=_default_async_configure
     )
 
     # Patch aiohttp session so the zeroconf / DNS resolver chain is never hit

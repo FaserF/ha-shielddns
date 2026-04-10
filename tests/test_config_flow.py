@@ -1,6 +1,6 @@
 """Test the ShieldDNS config flow."""
 
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
@@ -67,10 +67,12 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
         "custom_components.shielddns.client.ShieldDNSApiClient.get_stats",
         side_effect=ShieldDNSApiClientAuthenticationError,
     ):
-        hass.config_entries.flow.async_configure.return_value = {
-            "type": FlowResultType.FORM,
-            "errors": {"base": "invalid_auth"},
-        }
+        hass.config_entries.flow.async_configure.side_effect = AsyncMock(
+            return_value={
+                "type": FlowResultType.FORM,
+                "errors": {"base": "invalid_auth"},
+            }
+        )
         result2 = await hass.config_entries.flow.async_configure(
             result["step_id"],
             {
@@ -96,10 +98,12 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
         "custom_components.shielddns.client.ShieldDNSApiClient.get_stats",
         side_effect=ShieldDNSApiClientCommunicationError,
     ):
-        hass.config_entries.flow.async_configure.return_value = {
-            "type": FlowResultType.FORM,
-            "errors": {"base": "cannot_connect"},
-        }
+        hass.config_entries.flow.async_configure.side_effect = AsyncMock(
+            return_value={
+                "type": FlowResultType.FORM,
+                "errors": {"base": "cannot_connect"},
+            }
+        )
         result2 = await hass.config_entries.flow.async_configure(
             result["step_id"],
             {
