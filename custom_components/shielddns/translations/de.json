@@ -36,19 +36,19 @@
   "entity": {
     "sensor": {
       "total_queries": {
-        "name": "Gesamte Anfragen heute"
+        "name": "Anfragen heute"
       },
       "blocked_queries": {
         "name": "Blockierte Anfragen heute"
       },
       "block_percentage": {
-        "name": "Blockierte Anfragen in Prozent"
+        "name": "Blockrate"
       },
       "unique_clients": {
         "name": "Aktive Clients"
       },
       "avg_response_time": {
-        "name": "Durchschn. Antwortzeit"
+        "name": "Antwortzeit (Ø)"
       },
       "cache_hit_ratio": {
         "name": "Cache-Trefferrate"
