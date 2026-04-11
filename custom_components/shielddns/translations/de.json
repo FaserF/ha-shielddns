@@ -52,6 +52,32 @@
       },
       "cache_hit_ratio": {
         "name": "Cache-Trefferrate"
+      },
+      "db_size": {
+        "name": "Datenbankgröße"
+      },
+      "ram_usage": {
+        "name": "Arbeitsspeicher"
+      },
+      "cpu_usage": {
+        "name": "Systemlast (1m)"
+      },
+      "auto_blocked_count": {
+        "name": "Auto-blockierte Clients"
+      },
+      "connected_clients": {
+        "name": "Verbundene Geräte"
+      }
+    },
+    "binary_sensor": {
+      "shielddns_update_available": {
+        "name": "ShieldDNS-Update verfügbar"
+      },
+      "coredns_update_available": {
+        "name": "CoreDNS-Update verfügbar"
+      },
+      "abuse_protection_active": {
+        "name": "Missbrauchsschutz aktiv"
       }
     },
     "switch": {
@@ -93,6 +119,34 @@
         "domain": {
           "name": "Domain",
           "description": "Die zu entfernende Domain (z. B. tiktok.com)."
+        }
+      }
+    },
+    "set_client_alias": {
+      "name": "Client-Alias setzen",
+      "description": "Setzt einen Anzeigenamen (Alias) für eine bestimmte Client-IP-Adresse.",
+      "fields": {
+        "ip": {
+          "name": "Client-IP",
+          "description": "Die IP-Adresse des Clients (z. B. 192.168.1.50)."
+        },
+        "alias": {
+          "name": "Alias",
+          "description": "Der zuzuweisende Name (leer lassen zum Entfernen)."
+        }
+      }
+    },
+    "block_client": {
+      "name": "Client blockieren/freigeben",
+      "description": "Schaltet die Blockierung für ein bestimmtes Gerät anhand seiner IP umschalten.",
+      "fields": {
+        "ip": {
+          "name": "Client-IP",
+          "description": "Die IP-Adresse des zu verwaltenden Clients."
+        },
+        "block": {
+          "name": "Blockieren",
+          "description": "Ein für Blockieren, Aus für Freigeben."
         }
       }
     }

@@ -11,6 +11,7 @@ from homeassistant.components.binary_sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
@@ -40,6 +41,8 @@ BINARY_SENSORS: tuple[ShieldDNSBinarySensorEntityDescription, ...] = (
         key="coredns_update_available",
         translation_key="coredns_update_available",
         device_class=BinarySensorDeviceClass.UPDATE,
+        entity_registry_enabled_default=False,
+        entity_category=EntityCategory.DIAGNOSTIC,
         is_on_fn=lambda data: (
             (stats := data.get("stats")) is not None
             and stats.get("coredns_version") != stats.get("latest_coredns_version")

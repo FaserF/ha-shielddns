@@ -11,6 +11,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
@@ -133,6 +134,8 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         translation_key="db_size",
         icon="mdi:database",
         native_unit_of_measurement="MB",
+        entity_registry_enabled_default=False,
+        entity_category=EntityCategory.DIAGNOSTIC,
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda data: round(_get_stat(data, ["db_size_mb"], 0.0), 2),
     ),
@@ -141,6 +144,8 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         translation_key="ram_usage",
         icon="mdi:memory",
         native_unit_of_measurement="MB",
+        entity_registry_enabled_default=False,
+        entity_category=EntityCategory.DIAGNOSTIC,
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda data: round(_get_stat(data, ["ram_used_mb"], 0.0), 0),
     ),
@@ -148,6 +153,8 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         key="cpu_usage",
         translation_key="cpu_usage",
         icon="mdi:cpu-64-bit",
+        entity_registry_enabled_default=False,
+        entity_category=EntityCategory.DIAGNOSTIC,
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda data: round(_get_stat(data, ["cpu_usage"], 0.0), 2),
     ),
@@ -155,6 +162,8 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         key="auto_blocked_count",
         translation_key="auto_blocked_count",
         icon="mdi:account-lock",
+        entity_registry_enabled_default=False,
+        entity_category=EntityCategory.DIAGNOSTIC,
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda data: _get_stat(data, ["num_auto_blocked"], 0),
     ),
@@ -162,6 +171,8 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         key="connected_clients",
         translation_key="connected_clients",
         icon="mdi:account-group",
+        entity_registry_enabled_default=False,
+        entity_category=EntityCategory.DIAGNOSTIC,
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda data: len(data.get("clients", [])),
     ),
