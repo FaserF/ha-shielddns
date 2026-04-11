@@ -3,7 +3,12 @@
 from typing import Any
 
 import voluptuous as vol
-from homeassistant import config_entries
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlow,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
@@ -52,14 +57,14 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     return {"title": f"ShieldDNS ({data[CONF_HOST]})"}
 
 
-class ShieldDNSConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for ShieldDNS."""
 
     VERSION = 1
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
+    ) -> ConfigFlowResult:
         """Handle the initial step."""
         errors: dict[str, str] = {}
         if user_input is not None:
@@ -89,22 +94,22 @@ class ShieldDNSConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(
-        config_entry: config_entries.ConfigEntry,
-    ) -> config_entries.OptionsFlow:
+        config_entry: ConfigEntry,
+    ) -> OptionsFlow:
         """Create the options flow."""
         return ShieldDNSOptionsFlowHandler(config_entry)
 
 
-class ShieldDNSOptionsFlowHandler(config_entries.OptionsFlow):
+class ShieldDNSOptionsFlowHandler(OptionsFlow):
     """Handle an options flow for ShieldDNS."""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+    def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize options flow."""
         self.config_entry = config_entry
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
+    ) -> ConfigFlowResult:
         """Manage the options."""
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
@@ -128,3 +133,4 @@ class ShieldDNSOptionsFlowHandler(config_entries.OptionsFlow):
                 }
             ),
         )
+
