@@ -136,55 +136,143 @@ The integration provides the following entities to monitor and control your DNS 
 
 ## 📖 Automation Examples
 
+Maximize your network control with these advanced automation examples.
+
 <details>
-<summary><strong>🚨 Notification on High Block Rate Warning</strong></summary>
+<summary><b>⏱️ Temporary Device Bypass (1-Hour Unblock)</b></summary>
+
+Automatically unblock a device for 1 hour (e.g., to bypass filtering for a specific task) and then restore the block.
 
 ```yaml
-alias: "ShieldDNS: High Block Rate Alert"
+alias: "ShieldDNS: Temporary Device Bypass"
+description: "Unblocks a client IP for 1 hour"
+trigger:
+  - platform: state
+    entity_id: input_boolean.bypass_gaming_pc
+    to: "on"
+action:
+  - service: shielddns.block_client
+    data:
+      ip: "192.168.1.50"
+      block: false
+  - delay: "01:00:00"
+  - service: shielddns.block_client
+    data:
+      ip: "192.168.1.50"
+      block: true
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.bypass_gaming_pc
+```
+</details>
+
+<details>
+<summary><b>🚨 Security Alert: High Block Rate</b></summary>
+
+Receive a notification if more than 40% of queries in your network are being blocked, which could indicate a malware infection or an aggressive tracker.
+
+```yaml
+alias: "ShieldDNS: High Block-Rate Warning"
 trigger:
   - platform: numeric_state
     entity_id: sensor.shielddns_block_percentage
-    above: 80
+    above: 40
+    for: "00:05:00"
 action:
-  - service: notify.notify
+  - service: notify.mobile_app_your_phone
     data:
-      title: "🛡️ ShieldDNS Traffic Alert"
-      message: "Warning: Over {{ states('sensor.shielddns_block_percentage') }}% of your DNS queries are being blocked. A device might be compromised or aggressively pinging tracking domains."
+      title: "🛡️ ShieldDNS Security Alert"
+      message: "High block rate detected! {{ states('sensor.shielddns_block_percentage') }}% of queries are being blocked."
+      data:
+        clickAction: "/config/devices/dashboard"
 ```
 </details>
 
 <details>
-<summary><strong>🔁 Night Mode: Disable Filtering for Specific Maintenance</strong></summary>
+<summary><b>🌙 Night-time Child Protection (Scheduled Blocking)</b></summary>
+
+Automatically block access for a child's tablet or console during night hours.
 
 ```yaml
-alias: "ShieldDNS: Temporarily Disable Filtering for Backup Jobs"
-trigger:
-  - platform: time
-    at: "03:00:00"
-action:
-  - service: switch.turn_off
-    target:
-      entity_id: switch.shielddns_global_filtering
-  - delay:
-      hours: 1
-  - service: switch.turn_on
-    target:
-      entity_id: switch.shielddns_global_filtering
-```
-</details>
-
-<details>
-<summary><strong>🕒 Parental Control: Block TikTok at Night</strong></summary>
-
-```yaml
-alias: "ShieldDNS: Block TikTok at 8 PM"
+alias: "ShieldDNS: Night-time Console Block"
 trigger:
   - platform: time
     at: "20:00:00"
+    id: "night"
+  - platform: time
+    at: "08:00:00"
+    id: "morning"
+action:
+  - service: shielddns.block_client
+    data:
+      ip: "192.168.1.135"
+      block: "{{ trigger.id == 'night' }}"
+```
+</details>
+
+<details>
+<summary><b>🚀 Automatic Update Notifications</b></summary>
+
+Stay informed when a new version of ShieldDNS or CoreDNS is released (Uses the native `update` platform introduced in v1.6.0).
+
+```yaml
+alias: "ShieldDNS: Release Notification"
+trigger:
+  - platform: state
+    entity_id: 
+      - update.shielddns_update
+      - update.coredns_update
+    from: "off"
+    to: "on"
+action:
+  - service: notify.mobile_app_your_phone
+    data:
+      title: "🚀 Update Available: {{ state_attr(trigger.entity_id, 'friendly_name') }}"
+      message: "A new version ({{ state_attr(trigger.entity_id, 'latest_version') }}) is available. Current: {{ state_attr(trigger.entity_id, 'installed_version') }}"
+```
+</details>
+
+<details>
+<summary><b>📺 Dynamic Maintenance Bypass</b></summary>
+
+Temporarily disable all filtering when a specific maintenance task (e.g. system backup) is running.
+
+```yaml
+alias: "ShieldDNS: Maintenance Protection Toggle"
+trigger:
+  - platform: state
+    entity_id: binary_sensor.backup_running
+    to: "on"
+    id: "disable"
+  - platform: state
+    entity_id: binary_sensor.backup_running
+    to: "off"
+    id: "enable"
+action:
+  - service: switch.turn_{{ 'off' if trigger.id == 'disable' else 'on' }}
+    target:
+      entity_id: switch.shielddns_global_filtering
+```
+</details>
+
+<details>
+<summary><b>☁️ Guest Mode: Dynamic Content Blocking</b></summary>
+
+Switch your network to a stricter mode when the guest Wi-Fi is active.
+
+```yaml
+alias: "ShieldDNS: Switch to Strict Mode"
+trigger:
+  - platform: state
+    entity_id: binary_sensor.guest_wifi_active
+    to: "on"
 action:
   - service: shielddns.block_domain
     data:
       domain: "tiktok.com"
+  - service: shielddns.block_domain
+    data:
+      domain: "roblox.com"
 ```
 </details>
 
