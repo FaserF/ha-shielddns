@@ -110,6 +110,15 @@ The integration provides the following entities to monitor and control your DNS 
 - **Unique Clients**: How many client IPs have made queries in the last 24 hours.
 - **Avg. Response Time**: The average latency of DNS resolutions in milliseconds.
 - **Cache Hit Ratio**: Effectiveness of the local cache (percentage of queries served from cache).
+- **CPU Load (1m)**: The current 1-minute system load average.
+- **Memory Usage**: Amount of RAM currently utilized by the system (in MB).
+- **Database Size**: Current size of the SQLite query database on disk.
+- **Auto-Blocked Clients**: Number of clients currently under automated abuse protection.
+
+### Binary Sensors
+- **ShieldDNS Update Available**: On if a newer version of the ShieldDNS app is available on GitHub.
+- **CoreDNS Update Available**: On if a newer version of the CoreDNS engine is available.
+- **Abuse Protection Active**: On if any client is currently blocked due to malicious behavior patterns.
 
 ### Switch
 - **Global Filtering**: Turn this off to temporarily disable all ad-blocking and filtering. Turn it back on to resume normal protection.

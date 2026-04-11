@@ -128,6 +128,36 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
             0,
         ),
     ),
+    ShieldDNSSensorEntityDescription(
+        key="db_size",
+        translation_key="db_size",
+        icon="mdi:database",
+        native_unit_of_measurement="MB",
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda data: round(_get_stat(data, ["db_size_mb"], 0.0), 2),
+    ),
+    ShieldDNSSensorEntityDescription(
+        key="ram_usage",
+        translation_key="ram_usage",
+        icon="mdi:memory",
+        native_unit_of_measurement="MB",
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda data: round(_get_stat(data, ["ram_used_mb"], 0.0), 0),
+    ),
+    ShieldDNSSensorEntityDescription(
+        key="cpu_usage",
+        translation_key="cpu_usage",
+        icon="mdi:cpu-64-bit",
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda data: round(_get_stat(data, ["cpu_usage"], 0.0), 2),
+    ),
+    ShieldDNSSensorEntityDescription(
+        key="auto_blocked_count",
+        translation_key="auto_blocked_count",
+        icon="mdi:account-lock",
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda data: _get_stat(data, ["num_auto_blocked"], 0),
+    ),
 )
 
 

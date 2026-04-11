@@ -52,6 +52,29 @@
       },
       "cache_hit_ratio": {
         "name": "Cache Hit Ratio"
+      },
+      "db_size": {
+        "name": "Database Size"
+      },
+      "ram_usage": {
+        "name": "Memory Usage"
+      },
+      "cpu_usage": {
+        "name": "CPU Load (1m)"
+      },
+      "auto_blocked_count": {
+        "name": "Auto-Blocked Clients"
+      }
+    },
+    "binary_sensor": {
+      "shielddns_update_available": {
+        "name": "ShieldDNS Update Available"
+      },
+      "coredns_update_available": {
+        "name": "CoreDNS Update Available"
+      },
+      "abuse_protection_active": {
+        "name": "Abuse Protection Active"
       }
     },
     "switch": {

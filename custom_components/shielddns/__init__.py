@@ -20,7 +20,12 @@ from .const import (
 )
 from .coordinator import ShieldDNSDataUpdateCoordinator
 
-PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.SWITCH, Platform.BUTTON]
+PLATFORMS: list[Platform] = [
+    Platform.BINARY_SENSOR,
+    Platform.SENSOR,
+    Platform.SWITCH,
+    Platform.BUTTON,
+]
 
 SERVICE_BLOCK_DOMAIN = "block_domain"
 SERVICE_ALLOW_DOMAIN = "allow_domain"
