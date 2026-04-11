@@ -70,12 +70,6 @@
       }
     },
     "binary_sensor": {
-      "shielddns_update_available": {
-        "name": "ShieldDNS Update Available"
-      },
-      "coredns_update_available": {
-        "name": "CoreDNS Update Available"
-      },
       "abuse_protection_active": {
         "name": "Abuse Protection Active"
       }
@@ -88,6 +82,14 @@
     "button": {
       "refresh_lists": {
         "name": "Refresh Blocklists"
+      }
+    },
+    "update": {
+      "shielddns_update": {
+        "name": "ShieldDNS Update"
+      },
+      "coredns_update": {
+        "name": "CoreDNS Update"
       }
     }
   },

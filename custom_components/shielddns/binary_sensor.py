@@ -28,31 +28,6 @@ class ShieldDNSBinarySensorEntityDescription(BinarySensorEntityDescription):
     required_version: str | None = None
 
 
-BINARY_SENSORS: tuple[ShieldDNSBinarySensorEntityDescription, ...] = (
-    ShieldDNSBinarySensorEntityDescription(
-        key="shielddns_update_available",
-        translation_key="shielddns_update_available",
-        device_class=BinarySensorDeviceClass.UPDATE,
-        required_version="1.6.0",
-        is_on_fn=lambda data: (
-            (stats := data.get("stats")) is not None
-            and stats.get("version") != stats.get("latest_version")
-            and stats.get("latest_version") != ""
-        ),
-    ),
-    ShieldDNSBinarySensorEntityDescription(
-        key="coredns_update_available",
-        translation_key="coredns_update_available",
-        device_class=BinarySensorDeviceClass.UPDATE,
-        entity_registry_enabled_default=False,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        required_version="1.6.0",
-        is_on_fn=lambda data: (
-            (stats := data.get("stats")) is not None
-            and stats.get("coredns_version") != stats.get("latest_coredns_version")
-            and stats.get("latest_coredns_version") != ""
-        ),
-    ),
     ShieldDNSBinarySensorEntityDescription(
         key="abuse_protection_active",
         translation_key="abuse_protection_active",

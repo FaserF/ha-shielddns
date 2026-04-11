@@ -25,6 +25,7 @@ PLATFORMS: list[Platform] = [
     Platform.SENSOR,
     Platform.SWITCH,
     Platform.BUTTON,
+    Platform.UPDATE,
 ]
 
 SERVICE_BLOCK_DOMAIN = "block_domain"
