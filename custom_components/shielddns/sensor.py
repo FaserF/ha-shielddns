@@ -195,12 +195,10 @@ async def async_setup_entry(
     coordinator: ShieldDNSDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
 
     async_add_entities(
-        ShieldDNSSensor(coordinator, description)
+        ShieldDNSSensor(coordinator, description, entry.entry_id)
         for description in SENSORS
         if description.required_version is None
-        or AwesomeVersion(
-            coordinator.data.get("stats", {}).get("version", "0.0.0")
-        )
+        or AwesomeVersion(coordinator.data.get("stats", {}).get("version", "0.0.0"))
         >= AwesomeVersion(description.required_version)
     )
 

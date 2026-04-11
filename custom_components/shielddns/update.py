@@ -1,4 +1,5 @@
 """Update platform for ShieldDNS."""
+
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -59,9 +60,7 @@ async def async_setup_entry(
     async_add_entities(
         ShieldDNSUpdateEntity(coordinator, description, entry.entry_id)
         for description in UPDATE_ENTITIES
-        if AwesomeVersion(
-            coordinator.data.get("stats", {}).get("version", "0.0.0")
-        )
+        if AwesomeVersion(coordinator.data.get("stats", {}).get("version", "0.0.0"))
         >= AwesomeVersion("1.6.0")
     )
 

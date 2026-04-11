@@ -12,7 +12,6 @@ from homeassistant.components.binary_sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
@@ -28,6 +27,7 @@ class ShieldDNSBinarySensorEntityDescription(BinarySensorEntityDescription):
     required_version: str | None = None
 
 
+BINARY_SENSORS: tuple[ShieldDNSBinarySensorEntityDescription, ...] = (
     ShieldDNSBinarySensorEntityDescription(
         key="abuse_protection_active",
         translation_key="abuse_protection_active",
@@ -50,9 +50,7 @@ async def async_setup_entry(
         ShieldDNSBinarySensor(coordinator, description, entry.entry_id)
         for description in BINARY_SENSORS
         if description.required_version is None
-        or AwesomeVersion(
-            coordinator.data.get("stats", {}).get("version", "0.0.0")
-        )
+        or AwesomeVersion(coordinator.data.get("stats", {}).get("version", "0.0.0"))
         >= AwesomeVersion(description.required_version)
     )
 
