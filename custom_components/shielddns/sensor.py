@@ -4,6 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
+from awesomeversion import AwesomeVersion
 from homeassistant.components.sensor import (
     SensorEntity,
     SensorEntityDescription,
@@ -24,6 +25,7 @@ class ShieldDNSSensorEntityDescription(SensorEntityDescription):
     """Describes ShieldDNS sensor entity."""
 
     value_fn: Callable[[dict[str, Any]], Any]
+    required_version: str | None = None
 
 
 def _get_stat(data: dict[str, Any], keys: list[str], default: Any = 0) -> Any:
@@ -137,6 +139,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         entity_category=EntityCategory.DIAGNOSTIC,
         state_class=SensorStateClass.MEASUREMENT,
+        required_version="1.6.0",
         value_fn=lambda data: round(_get_stat(data, ["db_size_mb"], 0.0), 2),
     ),
     ShieldDNSSensorEntityDescription(
@@ -147,6 +150,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         entity_category=EntityCategory.DIAGNOSTIC,
         state_class=SensorStateClass.MEASUREMENT,
+        required_version="1.6.0",
         value_fn=lambda data: round(_get_stat(data, ["ram_used_mb"], 0.0), 0),
     ),
     ShieldDNSSensorEntityDescription(
@@ -156,6 +160,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         entity_category=EntityCategory.DIAGNOSTIC,
         state_class=SensorStateClass.MEASUREMENT,
+        required_version="1.6.0",
         value_fn=lambda data: round(_get_stat(data, ["cpu_usage"], 0.0), 2),
     ),
     ShieldDNSSensorEntityDescription(
@@ -165,6 +170,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         entity_category=EntityCategory.DIAGNOSTIC,
         state_class=SensorStateClass.MEASUREMENT,
+        required_version="1.6.0",
         value_fn=lambda data: _get_stat(data, ["num_auto_blocked"], 0),
     ),
     ShieldDNSSensorEntityDescription(
@@ -174,6 +180,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         entity_registry_enabled_default=False,
         entity_category=EntityCategory.DIAGNOSTIC,
         state_class=SensorStateClass.MEASUREMENT,
+        required_version="1.6.0",
         value_fn=lambda data: len(data.get("clients", [])),
     ),
 )
@@ -188,8 +195,13 @@ async def async_setup_entry(
     coordinator: ShieldDNSDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
 
     async_add_entities(
-        ShieldDNSSensor(coordinator, description, entry.entry_id)
+        ShieldDNSSensor(coordinator, description)
         for description in SENSORS
+        if description.required_version is None
+        or AwesomeVersion(
+            coordinator.data.get("stats", {}).get("version", "0.0.0")
+        )
+        >= AwesomeVersion(description.required_version)
     )
 
 

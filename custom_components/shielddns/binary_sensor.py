@@ -4,6 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
+from awesomeversion import AwesomeVersion
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
@@ -24,6 +25,7 @@ class ShieldDNSBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Describes ShieldDNS binary sensor entity."""
 
     is_on_fn: Callable[[dict[str, Any]], bool]
+    required_version: str | None = None
 
 
 BINARY_SENSORS: tuple[ShieldDNSBinarySensorEntityDescription, ...] = (
@@ -31,6 +33,7 @@ BINARY_SENSORS: tuple[ShieldDNSBinarySensorEntityDescription, ...] = (
         key="shielddns_update_available",
         translation_key="shielddns_update_available",
         device_class=BinarySensorDeviceClass.UPDATE,
+        required_version="1.6.0",
         is_on_fn=lambda data: (
             (stats := data.get("stats")) is not None
             and stats.get("version") != stats.get("latest_version")
@@ -43,6 +46,7 @@ BINARY_SENSORS: tuple[ShieldDNSBinarySensorEntityDescription, ...] = (
         device_class=BinarySensorDeviceClass.UPDATE,
         entity_registry_enabled_default=False,
         entity_category=EntityCategory.DIAGNOSTIC,
+        required_version="1.6.0",
         is_on_fn=lambda data: (
             (stats := data.get("stats")) is not None
             and stats.get("coredns_version") != stats.get("latest_coredns_version")
@@ -53,10 +57,8 @@ BINARY_SENSORS: tuple[ShieldDNSBinarySensorEntityDescription, ...] = (
         key="abuse_protection_active",
         translation_key="abuse_protection_active",
         device_class=BinarySensorDeviceClass.SAFETY,
-        is_on_fn=lambda data: (
-            (stats := data.get("stats")) is not None
-            and stats.get("num_auto_blocked", 0) > 0
-        ),
+        required_version="1.6.0",
+        is_on_fn=lambda data: (data.get("stats", {}).get("num_auto_blocked", 0) > 0),
     ),
 )
 
@@ -72,6 +74,11 @@ async def async_setup_entry(
     async_add_entities(
         ShieldDNSBinarySensor(coordinator, description, entry.entry_id)
         for description in BINARY_SENSORS
+        if description.required_version is None
+        or AwesomeVersion(
+            coordinator.data.get("stats", {}).get("version", "0.0.0")
+        )
+        >= AwesomeVersion(description.required_version)
     )
 
 
