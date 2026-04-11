@@ -44,3 +44,47 @@ remove_rule:
       example: "tiktok.com"
       selector:
         text:
+
+set_client_alias:
+  name: Set Client Alias
+  description: Set a friendly name (alias) for a specific client IP address.
+  target:
+    entity:
+      integration: shielddns
+  fields:
+    ip:
+      name: Client IP
+      description: The IP address of the client (e.g., 192.168.1.50).
+      required: true
+      example: "192.168.1.50"
+      selector:
+        text:
+    alias:
+      name: Alias
+      description: The friendly name to assign (leave empty to remove).
+      required: false
+      example: "Work Laptop"
+      selector:
+        text:
+
+block_client:
+  name: Block/Unblock Client
+  description: Toggles blocking for a specific client device by its IP.
+  target:
+    entity:
+      integration: shielddns
+  fields:
+    ip:
+      name: Client IP
+      description: The IP address of the client to manage.
+      required: true
+      example: "192.168.1.50"
+      selector:
+        text:
+    block:
+      name: Block
+      description: Set to ON to block, OFF to unblock.
+      required: true
+      default: true
+      selector:
+        boolean:

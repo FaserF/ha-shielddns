@@ -158,6 +158,13 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda data: _get_stat(data, ["num_auto_blocked"], 0),
     ),
+    ShieldDNSSensorEntityDescription(
+        key="connected_clients",
+        translation_key="connected_clients",
+        icon="mdi:account-group",
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=lambda data: len(data.get("clients", [])),
+    ),
 )
 
 

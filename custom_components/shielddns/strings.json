@@ -64,6 +64,9 @@
       },
       "auto_blocked_count": {
         "name": "Auto-Blocked Clients"
+      },
+      "connected_clients": {
+        "name": "Connected Clients"
       }
     },
     "binary_sensor": {
@@ -116,6 +119,34 @@
         "domain": {
           "name": "Domain",
           "description": "The domain to remove (e.g., tiktok.com)."
+        }
+      }
+    },
+    "set_client_alias": {
+      "name": "Set Client Alias",
+      "description": "Set a friendly name (alias) for a specific client IP address.",
+      "fields": {
+        "ip": {
+          "name": "Client IP",
+          "description": "The IP address of the client (e.g., 192.168.1.50)."
+        },
+        "alias": {
+          "name": "Alias",
+          "description": "The friendly name to assign (leave empty to remove)."
+        }
+      }
+    },
+    "block_client": {
+      "name": "Block/Unblock Client",
+      "description": "Toggles blocking for a specific client device by its IP.",
+      "fields": {
+        "ip": {
+          "name": "Client IP",
+          "description": "The IP address of the client to manage."
+        },
+        "block": {
+          "name": "Block",
+          "description": "Set to ON to block, OFF to unblock."
         }
       }
     }

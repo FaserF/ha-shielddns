@@ -115,3 +115,20 @@ class ShieldDNSApiClient:
     async def refresh_blocklists(self) -> None:
         """Trigger a blocklist refresh."""
         await self._api_wrapper("GET", f"{self._base_url}/refresh")
+
+    async def get_clients(self) -> list[dict[str, Any]]:
+        """Get all clients seen by ShieldDNS."""
+        return await self._api_wrapper("GET", f"{self._base_url}/clients")
+
+    async def set_client_alias(self, ip: str, alias: str) -> None:
+        """Set an alias for a specific client IP."""
+        await self._api_wrapper(
+            "POST", f"{self._base_url}/client/alias", data={"ip": ip, "alias": alias}
+        )
+
+    async def toggle_client_block(self, ip: str, block: bool) -> None:
+        """Block or unblock a specific client IP."""
+        action = "block" if block else "unblock"
+        await self._api_wrapper(
+            "POST", f"{self._base_url}/client/block", data={"ip": ip, "action": action}
+        )

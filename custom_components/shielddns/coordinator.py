@@ -46,9 +46,11 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         try:
             stats = await self.client.get_stats()
             filtering_status = await self.client.get_filtering_status()
+            clients = await self.client.get_clients()
             return {
                 "stats": stats,
                 "filtering_status": filtering_status,
+                "clients": clients,
             }
         except ShieldDNSApiClientError as exception:
             raise UpdateFailed(

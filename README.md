@@ -114,6 +114,7 @@ The integration provides the following entities to monitor and control your DNS 
 - **Memory Usage**: Amount of RAM currently utilized by the system (in MB).
 - **Database Size**: Current size of the SQLite query database on disk.
 - **Auto-Blocked Clients**: Number of clients currently under automated abuse protection.
+- **Connected Clients**: Real-time count of all unique devices that have utilized ShieldDNS for resolution.
 
 ### Binary Sensors
 - **ShieldDNS Update Available**: On if a newer version of the ShieldDNS app is available on GitHub.
@@ -130,6 +131,8 @@ The integration provides the following entities to monitor and control your DNS 
 - **`shielddns.block_domain`**: Instantly add a domain to the blocklist.
 - **`shielddns.allow_domain`**: Instantly add a domain to the allowlist.
 - **`shielddns.remove_rule`**: Remove a domain rule from both lists.
+- **`shielddns.set_client_alias`**: Assign a friendly name (alias) to a client's IP address.
+- **`shielddns.block_client`**: Toggle blocking status for a specific client device by its IP.
 
 ## 📖 Automation Examples
 

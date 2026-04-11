@@ -30,10 +30,26 @@ PLATFORMS: list[Platform] = [
 SERVICE_BLOCK_DOMAIN = "block_domain"
 SERVICE_ALLOW_DOMAIN = "allow_domain"
 SERVICE_REMOVE_RULE = "remove_rule"
+SERVICE_SET_CLIENT_ALIAS = "set_client_alias"
+SERVICE_BLOCK_CLIENT = "block_client"
 
 DOMAIN_SCHEMA = vol.Schema(
     {
         vol.Required("domain"): cv.string,
+    }
+)
+
+CLIENT_ALIAS_SCHEMA = vol.Schema(
+    {
+        vol.Required("ip"): cv.string,
+        vol.Optional("alias"): cv.string,
+    }
+)
+
+CLIENT_BLOCK_SCHEMA = vol.Schema(
+    {
+        vol.Required("ip"): cv.string,
+        vol.Required("block"): cv.boolean,
     }
 )
 
@@ -92,6 +108,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             if coord := hass.data[DOMAIN].get(entry_id):
                 await coord.client.remove_rule(call.data["domain"])
 
+    async def async_set_client_alias(call: ServiceCall) -> None:
+        """Set a client alias via ShieldDNS."""
+        from homeassistant.helpers.service import async_extract_config_entry_ids
+
+        entry_ids = await async_extract_config_entry_ids(call)
+        for entry_id in entry_ids or hass.data[DOMAIN]:
+            if coord := hass.data[DOMAIN].get(entry_id):
+                await coord.client.set_client_alias(
+                    call.data["ip"], call.data.get("alias", "")
+                )
+
+    async def async_block_client(call: ServiceCall) -> None:
+        """Block or unblock a client via ShieldDNS."""
+        from homeassistant.helpers.service import async_extract_config_entry_ids
+
+        entry_ids = await async_extract_config_entry_ids(call)
+        for entry_id in entry_ids or hass.data[DOMAIN]:
+            if coord := hass.data[DOMAIN].get(entry_id):
+                await coord.client.toggle_client_block(
+                    call.data["ip"], call.data["block"]
+                )
+
     if not hass.services.has_service(DOMAIN, SERVICE_BLOCK_DOMAIN):
         hass.services.async_register(
             DOMAIN, SERVICE_BLOCK_DOMAIN, async_block_domain, schema=DOMAIN_SCHEMA
@@ -103,6 +141,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if not hass.services.has_service(DOMAIN, SERVICE_REMOVE_RULE):
         hass.services.async_register(
             DOMAIN, SERVICE_REMOVE_RULE, async_remove_rule, schema=DOMAIN_SCHEMA
+        )
+    if not hass.services.has_service(DOMAIN, SERVICE_SET_CLIENT_ALIAS):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_SET_CLIENT_ALIAS,
+            async_set_client_alias,
+            schema=CLIENT_ALIAS_SCHEMA,
+        )
+    if not hass.services.has_service(DOMAIN, SERVICE_BLOCK_CLIENT):
+        hass.services.async_register(
+            DOMAIN, SERVICE_BLOCK_CLIENT, async_block_client, schema=CLIENT_BLOCK_SCHEMA
         )
 
     return True
@@ -117,6 +166,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.services.async_remove(DOMAIN, SERVICE_BLOCK_DOMAIN)
         hass.services.async_remove(DOMAIN, SERVICE_ALLOW_DOMAIN)
         hass.services.async_remove(DOMAIN, SERVICE_REMOVE_RULE)
+        hass.services.async_remove(DOMAIN, SERVICE_SET_CLIENT_ALIAS)
+        hass.services.async_remove(DOMAIN, SERVICE_BLOCK_CLIENT)
 
     return unload_ok
 
