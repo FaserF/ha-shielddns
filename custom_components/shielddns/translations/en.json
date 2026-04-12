@@ -70,8 +70,11 @@
       }
     },
     "binary_sensor": {
-      "abuse_protection_active": {
-        "name": "Abuse Protection Active"
+      "abuse_protection_enabled": {
+        "name": "Abuse Protection"
+      },
+      "abuse_detected": {
+        "name": "Abuse Detected"
       }
     },
     "switch": {

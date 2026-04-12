@@ -70,8 +70,11 @@
       }
     },
     "binary_sensor": {
-      "abuse_protection_active": {
-        "name": "Missbrauchsschutz aktiv"
+      "abuse_protection_enabled": {
+        "name": "Missbrauchsschutz"
+      },
+      "abuse_detected": {
+        "name": "Missbrauch erkannt"
       }
     },
     "switch": {

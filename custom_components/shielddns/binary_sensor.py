@@ -29,11 +29,20 @@ class ShieldDNSBinarySensorEntityDescription(BinarySensorEntityDescription):
 
 BINARY_SENSORS: tuple[ShieldDNSBinarySensorEntityDescription, ...] = (
     ShieldDNSBinarySensorEntityDescription(
-        key="abuse_protection_active",
-        translation_key="abuse_protection_active",
+        key="abuse_protection_enabled",
+        translation_key="abuse_protection_enabled",
+        device_class=BinarySensorDeviceClass.PROTECTION,
+        required_version="1.6.0",
+        is_on_fn=lambda data: data.get("filtering_status", {}).get(
+            "abuse_detection_enabled", False
+        ),
+    ),
+    ShieldDNSBinarySensorEntityDescription(
+        key="abuse_detected",
+        translation_key="abuse_detected",
         device_class=BinarySensorDeviceClass.SAFETY,
         required_version="1.6.0",
-        is_on_fn=lambda data: (data.get("stats", {}).get("num_auto_blocked", 0) > 0),
+        is_on_fn=lambda data: data.get("stats", {}).get("num_auto_blocked", 0) > 0,
     ),
 )
 
