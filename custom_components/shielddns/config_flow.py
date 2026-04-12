@@ -29,16 +29,6 @@ from .const import (
     DOMAIN,
 )
 
-STEP_USER_DATA_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_HOST): str,
-        vol.Required(CONF_PORT, default=DEFAULT_PORT): int,
-        vol.Required(CONF_TOKEN): str,
-        vol.Optional(CONF_USE_SSL, default=True): bool,
-        vol.Optional(CONF_VERIFY_SSL, default=True): bool,
-    }
-)
-
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
     """Validate the user input allows us to connect."""
@@ -84,7 +74,15 @@ class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="user",
-            data_schema=STEP_USER_DATA_SCHEMA,
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_HOST): str,
+                    vol.Required(CONF_PORT, default=DEFAULT_PORT): int,
+                    vol.Required(CONF_TOKEN): str,
+                    vol.Optional(CONF_USE_SSL, default=True): bool,
+                    vol.Optional(CONF_VERIFY_SSL, default=True): bool,
+                }
+            ),
             errors=errors,
             description_placeholders={
                 "docs_url": "https://github.com/FaserF/ha-shielddns"
@@ -105,6 +103,7 @@ class ShieldDNSOptionsFlowHandler(OptionsFlow):
 
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize options flow."""
+        super().__init__()
         self.config_entry = config_entry
 
     async def async_step_init(
@@ -133,4 +132,3 @@ class ShieldDNSOptionsFlowHandler(OptionsFlow):
                 }
             ),
         )
-

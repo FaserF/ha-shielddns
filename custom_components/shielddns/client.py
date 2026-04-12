@@ -58,7 +58,7 @@ class ShieldDNSApiClient:
         if headers is None:
             headers = {}
         headers["Authorization"] = f"Bearer {self._token}"
-        headers["X-Shield-Request"] = "1"
+        headers["X-Shield-Request"] = "true"
 
         try:
             async with asyncio.timeout(10):
