@@ -1,14 +1,20 @@
-# Configuration for actions/labeler
+# Configuration for actions/labeler v5+
+# https://github.com/actions/labeler
 
 integration:
-  - custom_components/**/*
+  - changed-files:
+      - any-glob-to-any-file: "custom_components/**/*"
 
 test:
-  - tests/**/*
+  - changed-files:
+      - any-glob-to-any-file: "tests/**/*"
 
 ci:
-  - .github/**/*
+  - changed-files:
+      - any-glob-to-any-file: ".github/**/*"
 
 docs:
-  - README.md
-  - docs/**/*
+  - changed-files:
+      - any-glob-to-any-file: 
+          - "README.md"
+          - "docs/**/*"
