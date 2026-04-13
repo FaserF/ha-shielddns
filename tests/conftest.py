@@ -19,11 +19,15 @@ from homeassistant.core import HomeAssistant
 # ---------------------------------------------------------------------------
 homeassistant.helpers.frame.report = lambda *args, **kwargs: None
 
-_frame_report_usage_patcher = patch(
-    "homeassistant.helpers.frame.report_usage",
-    new=MagicMock(),
-)
-_frame_report_usage_patcher.start()
+try:
+    _frame_report_usage_patcher = patch(
+        "homeassistant.helpers.frame.report_usage",
+        new=MagicMock(),
+    )
+    _frame_report_usage_patcher.start()
+except AttributeError:
+    # report_usage doesn't exist in this version of HA
+    pass
 
 try:
     _zeroconf_usage_patcher = patch(

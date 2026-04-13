@@ -50,14 +50,17 @@ async def test_switch(hass: HomeAssistant) -> None:
     # Test turning off
     with (
         patch(
-            "custom_components.shielddns.client.ShieldDNSApiClient.toggle_filtering"
+            "custom_components.shielddns.client.ShieldDNSApiClient.toggle_filtering",
+            new_callable=AsyncMock,
         ) as mock_toggle,
         patch(
             "custom_components.shielddns.client.ShieldDNSApiClient.get_stats",
+            new_callable=AsyncMock,
             return_value=stats_response,
         ),
         patch(
             "custom_components.shielddns.client.ShieldDNSApiClient.get_filtering_status",
+            new_callable=AsyncMock,
             return_value={"enabled": False},
         ),
     ):
@@ -68,6 +71,7 @@ async def test_switch(hass: HomeAssistant) -> None:
             blocking=True,
         )
         mock_toggle.assert_called_once_with(False)
+        await hass.async_block_till_done()
         state = hass.states.get(entity_id)
         assert state
         assert state.state == "off"
@@ -75,14 +79,17 @@ async def test_switch(hass: HomeAssistant) -> None:
     # Test turning on
     with (
         patch(
-            "custom_components.shielddns.client.ShieldDNSApiClient.toggle_filtering"
+            "custom_components.shielddns.client.ShieldDNSApiClient.toggle_filtering",
+            new_callable=AsyncMock,
         ) as mock_toggle,
         patch(
             "custom_components.shielddns.client.ShieldDNSApiClient.get_stats",
+            new_callable=AsyncMock,
             return_value=stats_response,
         ),
         patch(
             "custom_components.shielddns.client.ShieldDNSApiClient.get_filtering_status",
+            new_callable=AsyncMock,
             return_value={"enabled": True},
         ),
     ):
@@ -93,6 +100,7 @@ async def test_switch(hass: HomeAssistant) -> None:
             blocking=True,
         )
         mock_toggle.assert_called_once_with(True)
+        await hass.async_block_till_done()
         state = hass.states.get(entity_id)
         assert state
         assert state.state == "on"

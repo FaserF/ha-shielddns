@@ -35,7 +35,8 @@ async def test_services(hass: HomeAssistant) -> None:
     assert hass.services.has_service(DOMAIN, "remove_rule")
 
     with patch(
-        "custom_components.shielddns.client.ShieldDNSApiClient.add_rule"
+        "custom_components.shielddns.client.ShieldDNSApiClient.add_rule",
+        new_callable=AsyncMock,
     ) as mock_add_rule:
         await hass.services.async_call(
             DOMAIN,
@@ -46,7 +47,8 @@ async def test_services(hass: HomeAssistant) -> None:
         mock_add_rule.assert_called_once_with("tiktok.com", "block")
 
     with patch(
-        "custom_components.shielddns.client.ShieldDNSApiClient.add_rule"
+        "custom_components.shielddns.client.ShieldDNSApiClient.add_rule",
+        new_callable=AsyncMock,
     ) as mock_add_rule:
         await hass.services.async_call(
             DOMAIN,
@@ -57,7 +59,8 @@ async def test_services(hass: HomeAssistant) -> None:
         mock_add_rule.assert_called_once_with("netflix.com", "allow")
 
     with patch(
-        "custom_components.shielddns.client.ShieldDNSApiClient.remove_rule"
+        "custom_components.shielddns.client.ShieldDNSApiClient.remove_rule",
+        new_callable=AsyncMock,
     ) as mock_remove_rule:
         await hass.services.async_call(
             DOMAIN,
