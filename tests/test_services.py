@@ -1,6 +1,6 @@
 """Test ShieldDNS services."""
 
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -26,10 +26,6 @@ async def test_services(hass: HomeAssistant) -> None:
             "custom_components.shielddns.client.ShieldDNSApiClient.get_filtering_status",
             new_callable=AsyncMock,
             return_value={"enabled": True},
-        ),
-        patch(
-            "custom_components.shielddns.coordinator.ShieldDNSDataUpdateCoordinator.async_config_entry_first_refresh",
-            new_callable=AsyncMock,
         ),
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
