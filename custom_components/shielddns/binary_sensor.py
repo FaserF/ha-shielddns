@@ -44,6 +44,13 @@ BINARY_SENSORS: tuple[ShieldDNSBinarySensorEntityDescription, ...] = (
         required_version="1.6.0",
         is_on_fn=lambda data: data.get("stats", {}).get("num_auto_blocked", 0) > 0,
     ),
+    ShieldDNSBinarySensorEntityDescription(
+        key="dns_health",
+        translation_key="dns_health",
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
+        required_version="1.6.0",
+        is_on_fn=lambda data: data.get("stats", {}).get("coredns_alive", True),
+    ),
 )
 
 

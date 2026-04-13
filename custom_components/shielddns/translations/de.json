@@ -67,6 +67,12 @@
       },
       "connected_clients": {
         "name": "Verbundene Geräte"
+      },
+      "active_qps": {
+        "name": "Aktuelle QPS"
+      },
+      "uptime": {
+        "name": "System-Laufzeit"
       }
     },
     "binary_sensor": {
@@ -75,6 +81,9 @@
       },
       "abuse_detected": {
         "name": "Missbrauch erkannt"
+      },
+      "dns_health": {
+        "name": "DNS-Server Status"
       }
     },
     "switch": {
@@ -85,6 +94,12 @@
     "button": {
       "refresh_lists": {
         "name": "Blocklisten aktualisieren"
+      },
+      "reload_filters": {
+        "name": "Filter & DNS neu laden"
+      },
+      "clear_logs": {
+        "name": "Anfrage-Logs löschen"
       }
     },
     "update": {

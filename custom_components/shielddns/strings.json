@@ -67,11 +67,23 @@
       },
       "connected_clients": {
         "name": "Connected Clients"
+      },
+      "active_qps": {
+        "name": "Current QPS"
+      },
+      "uptime": {
+        "name": "System Uptime"
       }
     },
     "binary_sensor": {
-      "abuse_protection_active": {
-        "name": "Abuse Protection Active"
+      "abuse_protection_enabled": {
+        "name": "Abuse Protection Enabled"
+      },
+      "abuse_detected": {
+        "name": "Abuse Detected"
+      },
+      "dns_health": {
+        "name": "DNS Server Health"
       }
     },
     "switch": {
@@ -82,6 +94,12 @@
     "button": {
       "refresh_lists": {
         "name": "Refresh Blocklists"
+      },
+      "reload_filters": {
+        "name": "Reload Filters & DNS"
+      },
+      "clear_logs": {
+        "name": "Clear Query Logs"
       }
     },
     "update": {

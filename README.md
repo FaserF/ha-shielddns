@@ -29,10 +29,14 @@ No manual script-polling or complex setup is required — everything is handled 
   - **Blocked Queries**: See how many ads, trackers, and malicious domains were stopped.
   - **Block Percentage**: Real-time ratio of blocked vs allowed traffic.
   - **Unique Clients**: Monitor how many individual devices are currently utilizing ShieldDNS.
+  - **Real-time QPS**: Monitor your current **Queries Per Second** (10s average) for instant load feedback.
   - **Performance Metrics**: Monitor **Average Response Time** (latency) and **Cache Hit Ratio** to ensure peak resolution speed.
 - **Instance Management**:
   - **Global Filtering (Toggle)**: Instantly suspend or resume all blocklists and filtering across your entire network with a single switch.
-  - **Refresh Blocklists**: Native button to sync and update your blocklists on demand.
+  - **Maintenance Buttons**:
+    - **Refresh Blocklists**: Sync and update your filter lists.
+    - **Reload Filters & DNS**: Full synchronization and DNS engine restart.
+    - **Clear Query Logs**: Flush the SQLite query history with one click.
 - **System Information**:
   - Track your ShieldDNS instance performance directly via sensors.
 - **Native Experience**:
@@ -115,17 +119,22 @@ The integration provides the following entities to monitor and control your DNS 
 - **Database Size**: Current size of the SQLite query database on disk.
 - **Auto-Blocked Clients**: Number of clients currently under automated abuse protection.
 - **Connected Clients**: Real-time count of all unique devices that have utilized ShieldDNS for resolution.
+- **Current QPS**: Real-time Queries Per Second processed by the engine (10s rolling average).
+- **System Uptime**: The duration since the ShieldDNS service was last started.
 
 ### Binary Sensors
 - **ShieldDNS Update Available**: On if a newer version of the ShieldDNS app is available on GitHub.
 - **CoreDNS Update Available**: On if a newer version of the CoreDNS engine is available.
 - **Abuse Protection Active**: On if any client is currently blocked due to malicious behavior patterns.
+- **DNS Server Health**: On if the CoreDNS engine is healthy and responding to queries.
 
 ### Switch
 - **Global Filtering**: Turn this off to temporarily disable all ad-blocking and filtering. Turn it back on to resume normal protection.
 
 ### Button
-- **Refresh Blocklists**: Push this button to force ShieldDNS to fetch the latest updates for all subscribed filter lists immediately.
+- **Refresh Blocklists**: Fetch the latest updates for all subscribed filter lists.
+- **Reload Filters & DNS**: Performs a full sync of configuration and restarts the DNS engine.
+- **Clear Query Logs**: Deletes all recorded DNS query history from the database.
 
 ### Services
 - **`shielddns.block_domain`**: Instantly add a domain to the blocklist.

@@ -184,6 +184,15 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         value_fn=lambda data: len(data.get("clients", [])),
     ),
     ShieldDNSSensorEntityDescription(
+        key="active_qps",
+        translation_key="active_qps",
+        icon="mdi:speedometer",
+        native_unit_of_measurement="qps",
+        state_class=SensorStateClass.MEASUREMENT,
+        required_version="1.6.0",
+        value_fn=lambda data: round(_get_stat(data, ["active_qps"], 0.0), 1),
+    ),
+    ShieldDNSSensorEntityDescription(
         key="uptime",
         translation_key="uptime",
         icon="mdi:timer-sand",

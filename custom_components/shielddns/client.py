@@ -133,3 +133,11 @@ class ShieldDNSApiClient:
         await self._api_wrapper(
             "POST", f"{self._base_url}/client/block", data={"ip": ip, "action": action}
         )
+
+    async def clear_logs(self) -> None:
+        """Clear all query logs from the database."""
+        await self._api_wrapper("POST", f"{self._base_url}/logs/clear")
+
+    async def full_reload(self) -> None:
+        """Trigger a full reload of the DNS engine and filters."""
+        await self._api_wrapper("GET", f"{self._base_url}/system/full-reload")
