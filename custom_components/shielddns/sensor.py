@@ -183,6 +183,17 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         required_version="1.6.0",
         value_fn=lambda data: len(data.get("clients", [])),
     ),
+    ShieldDNSSensorEntityDescription(
+        key="uptime",
+        translation_key="uptime",
+        icon="mdi:timer-sand",
+        native_unit_of_measurement="s",
+        entity_registry_enabled_default=False,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        required_version="1.6.0",
+        value_fn=lambda data: _get_stat(data, ["uptime_seconds"], 0),
+    ),
 )
 
 
