@@ -56,15 +56,13 @@ class MockConfigEntry(ce.ConfigEntry):
         options: dict | None = None,
         **kwargs: Any,
     ) -> None:
-        super().__init__(  # type: ignore[call-arg]
+        super().__init__(
             data=data or {},
-            discovery_keys={},
             domain=domain,
             entry_id=entry_id or uuid.uuid4().hex,
             minor_version=0,
             options=options or {},
             source=ce.SOURCE_USER,
-            subentries_data={},
             title=title,
             unique_id=uuid.uuid4().hex,
             version=version,

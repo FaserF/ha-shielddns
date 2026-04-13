@@ -30,7 +30,6 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         super().__init__(
             hass,
             LOGGER,
-            config_entry=config_entry,
             name=DOMAIN,
             update_interval=timedelta(minutes=update_interval),
         )

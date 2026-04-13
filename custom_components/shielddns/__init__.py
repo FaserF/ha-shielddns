@@ -84,30 +84,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Register Services
     async def async_block_domain(call: ServiceCall) -> None:
         """Block a domain via ShieldDNS."""
-        from homeassistant.helpers.service import async_extract_config_entry_ids
-
-        entry_ids = await async_extract_config_entry_ids(call)
-        for entry_id in entry_ids or hass.data[DOMAIN]:
-            if coord := hass.data[DOMAIN].get(entry_id):
-                await coord.client.add_rule(call.data["domain"], "block")
+        for entry_id, coord in hass.data[DOMAIN].items():
+            await coord.client.add_rule(call.data["domain"], "block")
 
     async def async_allow_domain(call: ServiceCall) -> None:
         """Allow a domain via ShieldDNS."""
-        from homeassistant.helpers.service import async_extract_config_entry_ids
-
-        entry_ids = await async_extract_config_entry_ids(call)
-        for entry_id in entry_ids or hass.data[DOMAIN]:
-            if coord := hass.data[DOMAIN].get(entry_id):
-                await coord.client.add_rule(call.data["domain"], "allow")
+        for entry_id, coord in hass.data[DOMAIN].items():
+            await coord.client.add_rule(call.data["domain"], "allow")
 
     async def async_remove_rule(call: ServiceCall) -> None:
         """Remove a domain rule via ShieldDNS."""
-        from homeassistant.helpers.service import async_extract_config_entry_ids
-
-        entry_ids = await async_extract_config_entry_ids(call)
-        for entry_id in entry_ids or hass.data[DOMAIN]:
-            if coord := hass.data[DOMAIN].get(entry_id):
-                await coord.client.remove_rule(call.data["domain"])
+        for entry_id, coord in hass.data[DOMAIN].items():
+            await coord.client.remove_rule(call.data["domain"])
 
     async def async_set_client_alias(call: ServiceCall) -> None:
         """Set a client alias via ShieldDNS."""

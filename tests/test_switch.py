@@ -30,11 +30,17 @@ async def test_switch(hass: HomeAssistant) -> None:
     with (
         patch(
             "custom_components.shielddns.client.ShieldDNSApiClient.get_stats",
+            new_callable=AsyncMock,
             return_value=stats_response,
         ),
         patch(
             "custom_components.shielddns.client.ShieldDNSApiClient.get_filtering_status",
+            new_callable=AsyncMock,
             return_value=status_response,
+        ),
+        patch(
+            "custom_components.shielddns.coordinator.ShieldDNSDataUpdateCoordinator.async_config_entry_first_refresh",
+            new_callable=AsyncMock,
         ),
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
