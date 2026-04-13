@@ -31,7 +31,7 @@ BINARY_SENSORS: tuple[ShieldDNSBinarySensorEntityDescription, ...] = (
     ShieldDNSBinarySensorEntityDescription(
         key="abuse_protection_enabled",
         translation_key="abuse_protection_enabled",
-        device_class=BinarySensorDeviceClass.PROTECTION,
+        device_class=BinarySensorDeviceClass.SAFETY,
         required_version="1.6.0",
         is_on_fn=lambda data: data.get("filtering_status", {}).get(
             "abuse_detection_enabled", False
