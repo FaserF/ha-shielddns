@@ -4,7 +4,7 @@ import asyncio
 import sys
 import uuid
 from pathlib import Path
-from types import ModuleType
+from types import MappingProxyType, ModuleType
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -56,17 +56,27 @@ class MockConfigEntry(ce.ConfigEntry):
         options: dict | None = None,
         **kwargs: Any,
     ) -> None:
-        super().__init__(
-            data=data or {},
-            domain=domain,
-            entry_id=entry_id or uuid.uuid4().hex,
-            minor_version=0,
-            options=options or {},
-            source=ce.SOURCE_USER,
-            title=title,
-            unique_id=uuid.uuid4().hex,
-            version=version,
-        )
+        init_kwargs = {
+            "data": data or {},
+            "domain": domain,
+            "entry_id": entry_id or uuid.uuid4().hex,
+            "minor_version": 0,
+            "options": options or {},
+            "source": ce.SOURCE_USER,
+            "title": title,
+            "unique_id": uuid.uuid4().hex,
+            "version": version,
+        }
+        # Home Assistant 2024.12+ requires subentries_data, 2025.1+ requires discovery_keys
+        import inspect
+
+        params = inspect.signature(ce.ConfigEntry.__init__).parameters
+        if "discovery_keys" in params:
+            init_kwargs["discovery_keys"] = MappingProxyType({})
+        if "subentries_data" in params:
+            init_kwargs["subentries_data"] = None
+
+        super().__init__(**init_kwargs)
         object.__setattr__(self, "state", ce.ConfigEntryState.SETUP_IN_PROGRESS)
 
     def add_to_hass(self, hass: HomeAssistant) -> None:
@@ -125,23 +135,29 @@ async def hass(event_loop: asyncio.AbstractEventLoop) -> Any:
     hass_obj.data["network"] = MagicMock()
 
     # States mock
+    _mock_states: dict[str, str] = {
+        "total_queries": "1000",
+        "blocked_queries": "250",
+        "block_percentage": "25",
+        "unique_clients": "0",
+        "avg_response_time": "13",
+        "cache_hit_ratio": "15",
+        "filtering": "on",
+        "switch": "on",
+    }
+    _mock_units: dict[str, str] = {
+        "block_percentage": "%",
+        "avg_response_time": "ms",
+        "cache_hit_ratio": "%",
+    }
+
     def _mock_get(entity_id: str) -> MagicMock:
         s = MagicMock()
         s.attributes: dict[str, Any] = {}
-        mapping = {
-            "total_queries": ("1000", None),
-            "blocked_queries": ("250", None),
-            "block_percentage": ("25", "%"),
-            "unique_clients": ("0", None),
-            "avg_response_time": ("13", "ms"),
-            "cache_hit_ratio": ("15", "%"),
-            "filtering": ("on", None),
-            "switch": ("on", None),
-        }
-        for key, (val, unit) in mapping.items():
+        for key, val in _mock_states.items():
             if key in entity_id:
                 s.state = val
-                if unit:
+                if unit := _mock_units.get(key):
                     s.attributes["unit_of_measurement"] = unit
                 return s
         s.state = "unknown"
@@ -183,15 +199,21 @@ async def hass(event_loop: asyncio.AbstractEventLoop) -> Any:
             elif domain == "switch" and "filtering" in entity_id:
                 if service == "turn_on":
                     await coord.client.toggle_filtering(True)
+                    _mock_states["switch"] = "on"
+                    _mock_states["filtering"] = "on"
                 elif service == "turn_off":
                     await coord.client.toggle_filtering(False)
+                    _mock_states["switch"] = "off"
+                    _mock_states["filtering"] = "off"
 
     hass_obj.services.async_call = AsyncMock(side_effect=_async_call)
     hass_obj.services.async_register = MagicMock(
         side_effect=lambda d, s, fn, schema=None: _services.update({(d, s): fn})
     )
     hass_obj.services.async_remove = MagicMock()
-    hass_obj.services.has_service = MagicMock(side_effect=lambda d, s: True)
+    hass_obj.services.has_service = MagicMock(
+        side_effect=lambda d, s: (d, s) in _services
+    )
 
     # async_block_till_done is a no-op in tests
     hass_obj.async_block_till_done = AsyncMock()
