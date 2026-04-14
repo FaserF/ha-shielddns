@@ -33,7 +33,10 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         init_kwargs = {
             "update_interval": timedelta(minutes=update_interval),
         }
-        if "config_entry" in inspect.signature(DataUpdateCoordinator.__init__).parameters:
+        if (
+            "config_entry"
+            in inspect.signature(DataUpdateCoordinator.__init__).parameters
+        ):
             init_kwargs["config_entry"] = config_entry
 
         super().__init__(

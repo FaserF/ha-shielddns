@@ -1,5 +1,6 @@
 """Test ShieldDNS button."""
 
+from typing import Any
 from unittest.mock import AsyncMock, patch
 
 from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN
@@ -19,7 +20,7 @@ async def test_button(hass: HomeAssistant) -> None:
     )
     entry.add_to_hass(hass)
 
-    stats_response = {}
+    stats_response: dict[str, Any] = {}
     status_response = {"enabled": True}
 
     with (

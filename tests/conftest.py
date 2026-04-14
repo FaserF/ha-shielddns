@@ -92,8 +92,8 @@ class MockConfigEntry(ce.ConfigEntry):
 INSTANCES: list[Any] = []
 _mock_phcc = ModuleType("pytest_homeassistant_custom_component")
 _mock_phcc_common = ModuleType("pytest_homeassistant_custom_component.common")
-_mock_phcc_common.MockConfigEntry = MockConfigEntry  # type: ignore[attr-defined, misc]
-_mock_phcc_common.INSTANCES = INSTANCES  # type: ignore[attr-defined, misc]
+_mock_phcc_common.MockConfigEntry = MockConfigEntry  # type: ignore[attr-defined]
+_mock_phcc_common.INSTANCES = INSTANCES  # type: ignore[attr-defined]
 sys.modules.setdefault("pytest_homeassistant_custom_component", _mock_phcc)
 sys.modules["pytest_homeassistant_custom_component.common"] = _mock_phcc_common
 
@@ -104,7 +104,7 @@ sys.modules["pytest_homeassistant_custom_component.common"] = _mock_phcc_common
 
 
 @pytest.fixture
-def event_loop():
+def event_loop() -> Any:
     """Create a fresh event loop for each test."""
     loop = asyncio.new_event_loop()
     yield loop
@@ -123,7 +123,7 @@ async def hass(event_loop: asyncio.AbstractEventLoop) -> Any:
 
     # Minimal __init__
     hass_obj.loop = event_loop
-    hass_obj.data: dict[str, Any] = {}  # type: ignore[assignment]
+    hass_obj.data = {}
     hass_obj.states = MagicMock()
     hass_obj.bus = MagicMock()
     hass_obj.components = MagicMock()

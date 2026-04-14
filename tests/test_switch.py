@@ -1,5 +1,6 @@
 """Test ShieldDNS switch."""
 
+from typing import Any
 from unittest.mock import AsyncMock, patch
 
 from homeassistant.components.switch import (
@@ -24,7 +25,7 @@ async def test_switch(hass: HomeAssistant) -> None:
     )
     entry.add_to_hass(hass)
 
-    stats_response = {}
+    stats_response: dict[str, Any] = {}
     status_response = {"enabled": True}
 
     with (
