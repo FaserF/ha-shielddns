@@ -30,7 +30,7 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         # config_entry was added in Home Assistant 2024.12
         import inspect
 
-        init_kwargs = {
+        init_kwargs: dict[str, Any] = {
             "update_interval": timedelta(minutes=update_interval),
         }
         if (
