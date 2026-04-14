@@ -144,6 +144,7 @@ async def hass(event_loop: asyncio.AbstractEventLoop) -> Any:
         "cache_hit_ratio": "15",
         "filtering": "on",
         "switch": "on",
+        "update": "on",
     }
     _mock_units: dict[str, str] = {
         "block_percentage": "%",
