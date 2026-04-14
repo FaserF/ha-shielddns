@@ -27,11 +27,20 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self.client = client
         self.host = host
         self.port = port
+        # config_entry was added in Home Assistant 2024.12
+        import inspect
+
+        init_kwargs = {
+            "update_interval": timedelta(minutes=update_interval),
+        }
+        if "config_entry" in inspect.signature(DataUpdateCoordinator.__init__).parameters:
+            init_kwargs["config_entry"] = config_entry
+
         super().__init__(
             hass,
             LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(minutes=update_interval),
+            **init_kwargs,
         )
 
     @property
