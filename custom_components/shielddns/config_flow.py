@@ -47,7 +47,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     return {"title": f"ShieldDNS ({data[CONF_HOST]})"}
 
 
-class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):
+class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
     """Handle a config flow for ShieldDNS."""
 
     VERSION = 1
