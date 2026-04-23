@@ -115,7 +115,7 @@ class ShieldDNSApiClient:
 
     async def refresh_blocklists(self) -> None:
         """Trigger a blocklist refresh."""
-        await self._api_wrapper("GET", f"{self._base_url}/refresh")
+        await self._api_wrapper("POST", f"{self._base_url}/refresh")
 
     async def get_clients(self) -> list[dict[str, Any]]:
         """Get all clients seen by ShieldDNS."""
@@ -140,4 +140,8 @@ class ShieldDNSApiClient:
 
     async def full_reload(self) -> None:
         """Trigger a full reload of the DNS engine and filters."""
-        await self._api_wrapper("GET", f"{self._base_url}/system/full-reload")
+        await self._api_wrapper("POST", f"{self._base_url}/system/full-reload")
+
+    async def recheck_upstreams(self) -> None:
+        """Trigger a recheck of upstream DNS servers health."""
+        await self._api_wrapper("POST", f"{self._base_url}/diagnostics/recheck")

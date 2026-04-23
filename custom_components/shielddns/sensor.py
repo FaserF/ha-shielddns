@@ -203,6 +203,14 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         required_version="1.6.0",
         value_fn=lambda data: _get_stat(data, ["uptime_seconds"], 0),
     ),
+    ShieldDNSSensorEntityDescription(
+        key="blocked_domains",
+        translation_key="blocked_domains",
+        icon="mdi:list-status",
+        state_class=SensorStateClass.MEASUREMENT,
+        required_version="1.6.5",
+        value_fn=lambda data: _get_stat(data, ["blocked_domains"], 0),
+    ),
 )
 
 

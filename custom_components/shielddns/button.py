@@ -23,6 +23,7 @@ async def async_setup_entry(
             ShieldDNSRefreshListsButton(coordinator, entry.entry_id),
             ShieldDNSReloadFiltersButton(coordinator, entry.entry_id),
             ShieldDNSClearLogsButton(coordinator, entry.entry_id),
+            ShieldDNSRecheckUpstreamsButton(coordinator, entry.entry_id),
         ]
     )
 
@@ -85,3 +86,23 @@ class ShieldDNSClearLogsButton(ShieldDNSEntity, ButtonEntity):
     async def async_press(self) -> None:
         """Press the button."""
         await self.coordinator.client.clear_logs()
+
+
+class ShieldDNSRecheckUpstreamsButton(ShieldDNSEntity, ButtonEntity):
+    """Representation of a ShieldDNS Recheck Upstreams button."""
+
+    _attr_translation_key = "recheck_upstreams"
+    _attr_icon = "mdi:flask-round-bottom"
+
+    def __init__(
+        self,
+        coordinator: ShieldDNSDataUpdateCoordinator,
+        entry_id: str,
+    ) -> None:
+        """Initialize."""
+        super().__init__(coordinator, entry_id)
+        self._attr_unique_id = f"{entry_id}_recheck_upstreams"
+
+    async def async_press(self) -> None:
+        """Press the button."""
+        await self.coordinator.client.recheck_upstreams()

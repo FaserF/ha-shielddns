@@ -45,21 +45,6 @@ UPDATE_ENTITIES: tuple[ShieldDNSUpdateEntityDescription, ...] = (
             or None
         ),
     ),
-    ShieldDNSUpdateEntityDescription(
-        key="coredns_update",
-        translation_key="coredns_update",
-        device_class=UpdateDeviceClass.FIRMWARE,
-        installed_version_fn=lambda data: (
-            data.get("stats", {}).get("coredns_version")
-            or data.get("stats", {}).get("CoreDNSVersion")
-            or None
-        ),
-        latest_version_fn=lambda data: (
-            data.get("stats", {}).get("latest_coredns_version")
-            or data.get("stats", {}).get("LatestCoreDNSVersion")
-            or None
-        ),
-    ),
 )
 
 

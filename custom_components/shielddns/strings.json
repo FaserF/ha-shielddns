@@ -73,6 +73,9 @@
       },
       "uptime": {
         "name": "System Uptime"
+      },
+      "blocked_domains": {
+        "name": "Blocked Domains (Total)"
       }
     },
     "binary_sensor": {
@@ -100,14 +103,14 @@
       },
       "clear_logs": {
         "name": "Clear Query Logs"
+      },
+      "recheck_upstreams": {
+        "name": "Recheck Upstreams"
       }
     },
     "update": {
       "shielddns_update": {
         "name": "ShieldDNS Update"
-      },
-      "coredns_update": {
-        "name": "CoreDNS Update"
       }
     }
   },
