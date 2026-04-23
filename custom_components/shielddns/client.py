@@ -145,3 +145,7 @@ class ShieldDNSApiClient:
     async def recheck_upstreams(self) -> None:
         """Trigger a recheck of upstream DNS servers health."""
         await self._api_wrapper("POST", f"{self._base_url}/diagnostics/recheck")
+
+    async def get_diagnostics(self) -> dict[str, Any]:
+        """Get detailed system diagnostics."""
+        return await self._api_wrapper("GET", f"{self._base_url}/diagnostics")

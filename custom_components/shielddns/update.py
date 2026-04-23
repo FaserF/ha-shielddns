@@ -42,6 +42,8 @@ UPDATE_ENTITIES: tuple[ShieldDNSUpdateEntityDescription, ...] = (
         latest_version_fn=lambda data: (
             data.get("stats", {}).get("latest_version")
             or data.get("stats", {}).get("LatestVersion")
+            or data.get("stats", {}).get("version")
+            or data.get("stats", {}).get("Version")
             or None
         ),
     ),

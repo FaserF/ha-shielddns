@@ -69,4 +69,6 @@ asyncio_mode = "auto"
 pythonpath = ["."]
 filterwarnings = [
     "ignore:Inheritance class HomeAssistantApplication from web.Application is discouraged:DeprecationWarning",
+    "ignore:unclosed <aiohttp.client.ClientSession:ResourceWarning",
+    "ignore:Unclosed client session:ResourceWarning",
 ]

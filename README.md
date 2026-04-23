@@ -36,7 +36,10 @@ No manual script-polling or complex setup is required — everything is handled 
   - **Maintenance Buttons**:
     - **Refresh Blocklists**: Sync and update your filter lists.
     - **Reload Filters & DNS**: Full synchronization and DNS engine restart.
+    - **Recheck Upstreams**: Trigger a health check for upstream DNS servers.
     - **Clear Query Logs**: Flush the SQLite query history with one click.
+- **Diagnostics**:
+  - **Download Diagnostics**: Native support for Home Assistant diagnostic reports (redacted for privacy).
 - **System Information**:
   - Track your ShieldDNS instance performance directly via sensors.
 - **Native Experience**:
@@ -120,13 +123,15 @@ The integration provides the following entities to monitor and control your DNS 
 - **Auto-Blocked Clients**: Number of clients currently under automated abuse protection.
 - **Connected Clients**: Real-time count of all unique devices that have utilized ShieldDNS for resolution.
 - **Current QPS**: Real-time Queries Per Second processed by the engine (10s rolling average).
+- **Blocked Domains (Total)**: Total number of unique domains currently blocked across all active lists.
 - **System Uptime**: The duration since the ShieldDNS service was last started.
 
 ### Binary Sensors
-- **ShieldDNS Update Available**: On if a newer version of the ShieldDNS app is available on GitHub.
-- **CoreDNS Update Available**: On if a newer version of the CoreDNS engine is available.
 - **Abuse Protection Active**: On if any client is currently blocked due to malicious behavior patterns.
 - **DNS Server Health**: On if the CoreDNS engine is healthy and responding to queries.
+
+### Update
+- **ShieldDNS Update**: Monitor and trigger updates for the ShieldDNS core application.
 
 ### Switch
 - **Global Filtering**: Turn this off to temporarily disable all ad-blocking and filtering. Turn it back on to resume normal protection.
@@ -134,6 +139,7 @@ The integration provides the following entities to monitor and control your DNS 
 ### Button
 - **Refresh Blocklists**: Fetch the latest updates for all subscribed filter lists.
 - **Reload Filters & DNS**: Performs a full sync of configuration and restarts the DNS engine.
+- **Recheck Upstreams**: Triggers a manual health and latency check for configured upstream servers.
 - **Clear Query Logs**: Deletes all recorded DNS query history from the database.
 
 ### Services
@@ -228,16 +234,14 @@ Stay informed when a new version of ShieldDNS or CoreDNS is released (Uses the n
 alias: "ShieldDNS: Release Notification"
 trigger:
   - platform: state
-    entity_id: 
-      - update.shielddns_update
-      - update.coredns_update
+    entity_id: update.shielddns_update
     from: "off"
     to: "on"
 action:
   - service: notify.mobile_app_your_phone
     data:
-      title: "🚀 Update Available: {{ state_attr(trigger.entity_id, 'friendly_name') }}"
-      message: "A new version ({{ state_attr(trigger.entity_id, 'latest_version') }}) is available. Current: {{ state_attr(trigger.entity_id, 'installed_version') }}"
+      title: "🚀 Update Available: ShieldDNS"
+      message: "A new version ({{ state_attr('update.shielddns_update', 'latest_version') }}) is available. Current: {{ state_attr('update.shielddns_update', 'installed_version') }}"
 ```
 </details>
 
