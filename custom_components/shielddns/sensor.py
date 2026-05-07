@@ -40,6 +40,7 @@ def _get_stat(data: dict[str, Any], keys: list[str], default: Any = 0) -> Any:
 SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ShieldDNSSensorEntityDescription(
         key="total_queries",
+        name="Total Queries Today",
         translation_key="total_queries",
         icon="mdi:help-network",
         state_class=SensorStateClass.TOTAL,
@@ -49,6 +50,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="blocked_queries",
+        name="Blocked Queries Today",
         translation_key="blocked_queries",
         icon="mdi:shield-alert",
         state_class=SensorStateClass.TOTAL,
@@ -58,6 +60,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="block_percentage",
+        name="Block Percentage",
         translation_key="block_percentage",
         icon="mdi:percent",
         native_unit_of_measurement="%",
@@ -92,6 +95,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="unique_clients",
+        name="Unique Clients",
         translation_key="unique_clients",
         icon="mdi:lan",
         state_class=SensorStateClass.MEASUREMENT,
@@ -99,6 +103,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="avg_response_time",
+        name="Avg. Response Time",
         translation_key="avg_response_time",
         icon="mdi:timer-outline",
         native_unit_of_measurement="ms",
@@ -107,6 +112,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="cache_hit_ratio",
+        name="Cache Hit Ratio",
         translation_key="cache_hit_ratio",
         icon="mdi:database-check",
         native_unit_of_measurement="%",
@@ -133,6 +139,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="db_size",
+        name="Database Size",
         translation_key="db_size",
         icon="mdi:database",
         native_unit_of_measurement="MB",
@@ -144,6 +151,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="ram_usage",
+        name="Memory Usage",
         translation_key="ram_usage",
         icon="mdi:memory",
         native_unit_of_measurement="MB",
@@ -155,6 +163,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="cpu_usage",
+        name="CPU Load (1m)",
         translation_key="cpu_usage",
         icon="mdi:cpu-64-bit",
         entity_registry_enabled_default=False,
@@ -165,6 +174,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="auto_blocked_count",
+        name="Auto-Blocked Clients",
         translation_key="auto_blocked_count",
         icon="mdi:account-lock",
         entity_registry_enabled_default=False,
@@ -175,6 +185,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="connected_clients",
+        name="Connected Clients",
         translation_key="connected_clients",
         icon="mdi:account-group",
         entity_registry_enabled_default=False,
@@ -185,6 +196,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="active_qps",
+        name="Current QPS",
         translation_key="active_qps",
         icon="mdi:speedometer",
         native_unit_of_measurement="qps",
@@ -194,6 +206,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="uptime",
+        name="System Uptime",
         translation_key="uptime",
         icon="mdi:timer-sand",
         native_unit_of_measurement="s",
@@ -205,6 +218,7 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="blocked_domains",
+        name="Blocked Domains (Total)",
         translation_key="blocked_domains",
         icon="mdi:list-status",
         state_class=SensorStateClass.MEASUREMENT,
@@ -213,13 +227,17 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
     ),
     ShieldDNSSensorEntityDescription(
         key="top_blocked_domain",
+        name="Top Blocked Domain",
         translation_key="top_blocked_domain",
         icon="mdi:shield-bug",
         required_version="1.8.0",
-        value_fn=lambda data: (data.get("top_blocked") or [{}])[0].get("domain"),
+        value_fn=lambda data: (
+            (data.get("top_blocked") or [{"domain": None}])[0].get("domain")
+        ),
     ),
     ShieldDNSSensorEntityDescription(
         key="top_client",
+        name="Top Client",
         translation_key="top_client",
         icon="mdi:account-star",
         required_version="1.8.0",

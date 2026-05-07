@@ -68,13 +68,15 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 # Fallback for older versions
                 pass
 
-            return {
+            data = {
                 "stats": stats,
                 "filtering_status": filtering_status,
-                "clients": clients,
-                "top_blocked": top_blocked,
-                "top_clients": top_clients,
+                "clients": clients or [],
+                "top_blocked": top_blocked or [],
+                "top_clients": top_clients or [],
             }
+            LOGGER.debug("ShieldDNS data update: %s", data)
+            return data
         except ShieldDNSApiClientError as exception:
             raise UpdateFailed(
                 f"Error communicating with API: {exception}"
