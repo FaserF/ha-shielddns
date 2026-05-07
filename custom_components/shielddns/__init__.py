@@ -33,6 +33,7 @@ SERVICE_ALLOW_DOMAIN = "allow_domain"
 SERVICE_REMOVE_RULE = "remove_rule"
 SERVICE_SET_CLIENT_ALIAS = "set_client_alias"
 SERVICE_BLOCK_CLIENT = "block_client"
+SERVICE_SET_DOMAIN_MAPPING = "set_domain_mapping"
 
 DOMAIN_SCHEMA = vol.Schema(
     {
@@ -51,6 +52,13 @@ CLIENT_BLOCK_SCHEMA = vol.Schema(
     {
         vol.Required("ip"): cv.string,
         vol.Required("block"): cv.boolean,
+    }
+)
+
+DOMAIN_MAPPING_SCHEMA = vol.Schema(
+    {
+        vol.Required("domain"): cv.string,
+        vol.Required("ip"): cv.string,
     }
 )
 
@@ -119,6 +127,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                     call.data["ip"], call.data["block"]
                 )
 
+    async def async_set_domain_mapping(call: ServiceCall) -> None:
+        """Set a domain mapping via ShieldDNS."""
+        for _entry_id, coord in hass.data[DOMAIN].items():
+            await coord.client.set_domain_mapping(call.data["domain"], call.data["ip"])
+
     if not hass.services.has_service(DOMAIN, SERVICE_BLOCK_DOMAIN):
         hass.services.async_register(
             DOMAIN, SERVICE_BLOCK_DOMAIN, async_block_domain, schema=DOMAIN_SCHEMA
@@ -142,6 +155,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.services.async_register(
             DOMAIN, SERVICE_BLOCK_CLIENT, async_block_client, schema=CLIENT_BLOCK_SCHEMA
         )
+    if not hass.services.has_service(DOMAIN, SERVICE_SET_DOMAIN_MAPPING):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_SET_DOMAIN_MAPPING,
+            async_set_domain_mapping,
+            schema=DOMAIN_MAPPING_SCHEMA,
+        )
 
     return True
 
@@ -157,6 +177,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.services.async_remove(DOMAIN, SERVICE_REMOVE_RULE)
         hass.services.async_remove(DOMAIN, SERVICE_SET_CLIENT_ALIAS)
         hass.services.async_remove(DOMAIN, SERVICE_BLOCK_CLIENT)
+        hass.services.async_remove(DOMAIN, SERVICE_SET_DOMAIN_MAPPING)
 
     return unload_ok
 

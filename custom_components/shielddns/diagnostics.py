@@ -34,6 +34,8 @@ async def async_get_config_entry_diagnostics(
             backend_diagnostics, REDACT_STATS
         )
     except Exception:  # pylint: disable=broad-except
-        diagnostics_data["backend_diagnostics"] = "Could not fetch backend diagnostics"
+        diagnostics_data["backend_diagnostics"] = {
+            "error": "Could not fetch backend diagnostics"
+        }
 
     return diagnostics_data

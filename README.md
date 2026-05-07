@@ -90,7 +90,9 @@ The integration requires an API Token to communicate with your ShieldDNS instanc
 1. Open the ShieldDNS Web UI and navigate to **Settings** > **API Keys**.
 2. Create a new API key with the following permissions:
     - `read:stats` (Required for sensors and status)
-    - `write:filtering` (Required for toggling protection and refreshing lists)
+    - `read:diagnostics` (Required for diagnostic reports)
+    - `write:rules` (Required for toggling protection, adding/removing rules, and client management)
+    - `write:maintenance` (Required for maintenance buttons like Refresh, Reload, Clear Logs, etc.)
 3. Copy the generated token.
 4. Note down the generated API Token.
 

@@ -58,16 +58,22 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             stats = await self.client.get_stats()
             filtering_status = await self.client.get_filtering_status()
             clients = []
+            top_blocked = []
+            top_clients = []
             try:
                 clients = await self.client.get_clients()
+                top_blocked = await self.client.get_top_blocked()
+                top_clients = await self.client.get_top_clients()
             except ShieldDNSApiClientError:
-                # Fallback for older versions that don't have /api/clients
+                # Fallback for older versions
                 pass
 
             return {
                 "stats": stats,
                 "filtering_status": filtering_status,
                 "clients": clients,
+                "top_blocked": top_blocked,
+                "top_clients": top_clients,
             }
         except ShieldDNSApiClientError as exception:
             raise UpdateFailed(

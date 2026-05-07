@@ -76,6 +76,12 @@
       },
       "blocked_domains": {
         "name": "Blocked Domains (Total)"
+      },
+      "top_blocked_domain": {
+        "name": "Top Blocked Domain"
+      },
+      "top_client": {
+        "name": "Top Client"
       }
     },
     "binary_sensor": {
@@ -170,6 +176,20 @@
         "block": {
           "name": "Block",
           "description": "Set to ON to block, OFF to unblock."
+        }
+      }
+    },
+    "set_domain_mapping": {
+      "name": "Set Domain Mapping",
+      "description": "Set a custom DNS mapping (A/AAAA) for a domain.",
+      "fields": {
+        "domain": {
+          "name": "Domain",
+          "description": "The domain to map (e.g., local.home)."
+        },
+        "ip": {
+          "name": "IP Address",
+          "description": "The IP address to map the domain to (e.g., 192.168.1.10)."
         }
       }
     }

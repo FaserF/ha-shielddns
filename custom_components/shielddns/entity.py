@@ -29,6 +29,7 @@ class ShieldDNSEntity(CoordinatorEntity[ShieldDNSDataUpdateCoordinator]):
             identifiers={(DOMAIN, self.entry_id)},
             name=f"ShieldDNS ({self.coordinator.host})",
             manufacturer="ShieldDNS",
+            model="Secure DNS Management",
             sw_version=version,
             configuration_url=self.coordinator.admin_url,
         )

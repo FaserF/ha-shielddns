@@ -76,6 +76,12 @@
       },
       "blocked_domains": {
         "name": "Blockierte Domains (Gesamt)"
+      },
+      "top_blocked_domain": {
+        "name": "Meistblockierte Domain"
+      },
+      "top_client": {
+        "name": "Aktivster Client"
       }
     },
     "binary_sensor": {

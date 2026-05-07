@@ -211,6 +211,23 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         required_version="1.6.5",
         value_fn=lambda data: _get_stat(data, ["blocked_domains"], 0),
     ),
+    ShieldDNSSensorEntityDescription(
+        key="top_blocked_domain",
+        translation_key="top_blocked_domain",
+        icon="mdi:shield-bug",
+        required_version="1.8.0",
+        value_fn=lambda data: (data.get("top_blocked") or [{}])[0].get("domain"),
+    ),
+    ShieldDNSSensorEntityDescription(
+        key="top_client",
+        translation_key="top_client",
+        icon="mdi:account-star",
+        required_version="1.8.0",
+        value_fn=lambda data: (
+            (tc := (data.get("top_clients") or [{}])[0])
+            and (tc.get("client_alias") or tc.get("client_ip"))
+        ),
+    ),
 )
 
 

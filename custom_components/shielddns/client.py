@@ -149,3 +149,19 @@ class ShieldDNSApiClient:
     async def get_diagnostics(self) -> dict[str, Any]:
         """Get detailed system diagnostics."""
         return await self._api_wrapper("GET", f"{self._base_url}/diagnostics")
+
+    async def get_top_blocked(self) -> list[dict[str, Any]]:
+        """Get the top blocked domains in the last 24 hours."""
+        return await self._api_wrapper("GET", f"{self._base_url}/top-blocked")
+
+    async def get_top_clients(self) -> list[dict[str, Any]]:
+        """Get the top clients by query count in the last 24 hours."""
+        return await self._api_wrapper("GET", f"{self._base_url}/top-clients")
+
+    async def set_domain_mapping(self, domain: str, ip: str) -> None:
+        """Set a custom DNS mapping for a domain."""
+        await self._api_wrapper(
+            "POST",
+            f"{self._base_url}/rules/add",
+            data={"domain": domain, "type": "mapping", "ip": ip},
+        )

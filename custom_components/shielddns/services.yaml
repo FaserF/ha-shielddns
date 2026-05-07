@@ -88,3 +88,25 @@ block_client:
       default: true
       selector:
         boolean:
+
+set_domain_mapping:
+  name: Set Domain Mapping
+  description: Set a custom DNS mapping (A/AAAA) for a domain.
+  target:
+    entity:
+      integration: shielddns
+  fields:
+    domain:
+      name: Domain
+      description: The domain to map (e.g., local.home).
+      required: true
+      example: "local.home"
+      selector:
+        text:
+    ip:
+      name: IP Address
+      description: The IP address to map the domain to (e.g., 192.168.1.10).
+      required: true
+      example: "192.168.1.10"
+      selector:
+        text:
