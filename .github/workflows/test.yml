@@ -22,7 +22,7 @@ jobs:
         run: |
           pytest --cov=custom_components.shielddns --cov-report=xml
       - name: Upload coverage
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
