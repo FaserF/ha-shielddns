@@ -178,6 +178,20 @@
           "description": "Ein für Blockieren, Aus für Freigeben."
         }
       }
+    },
+    "set_domain_mapping": {
+      "name": "Domain-Mapping festlegen",
+      "description": "Legt ein benutzerdefiniertes DNS-Mapping (A/AAAA) für eine Domain fest.",
+      "fields": {
+        "domain": {
+          "name": "Domain",
+          "description": "Die zu mappende Domain (z.B. local.home)."
+        },
+        "ip": {
+          "name": "IP-Adresse",
+          "description": "Die IP-Adresse, auf die die Domain gemappt werden soll (z.B. 192.168.1.10)."
+        }
+      }
     }
   }
 }
