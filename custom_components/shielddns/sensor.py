@@ -231,8 +231,8 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
         translation_key="top_blocked_domain",
         icon="mdi:shield-bug",
         required_version="1.8.0",
-        value_fn=lambda data: (
-            (data.get("top_blocked") or [{"domain": None}])[0].get("domain")
+        value_fn=lambda data: (data.get("top_blocked") or [{"domain": None}])[0].get(
+            "domain"
         ),
     ),
     ShieldDNSSensorEntityDescription(
