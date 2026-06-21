@@ -1,0 +1,63 @@
+name: Feature Request
+description: Suggest a new feature or improvement for the ShieldDNS integration
+title: '[Feature]: '
+labels: ['enhancement', 'triage']
+assignees:
+  - FaserF
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Before You Submit
+        - Search [existing feature requests](https://github.com/FaserF/ha-shielddns/issues?q=label%3Aenhancement) to avoid duplicates
+        - Read the [documentation](https://github.com/FaserF/ha-shielddns/blob/master/README.md)
+        - Check the integration: [![Open Integration](https://my.home-assistant.io/badges/integration.svg)](https://my.home-assistant.io/redirect/integration/?domain=shielddns)
+
+  - type: textarea
+    id: problem_description
+    attributes:
+      label: Problem Description
+      description: Is your feature request related to a problem? Describe it clearly.
+      placeholder: I'm always frustrated when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution_description
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution or feature you'd like to see.
+      placeholder: I would like...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: feature_area
+    attributes:
+      label: Feature Area
+      description: Which area of the integration does this feature relate to?
+      options:
+        - DNS blocking / filtering status
+        - Blocklist management
+        - DNS query statistics
+        - Connection monitoring
+        - Sensor / entity improvements
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or features you've considered?
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or references about the feature request here.
+    validations:
+      required: false
