@@ -203,9 +203,7 @@ jobs:
 
       - name: 📦 Zip Component
         run: |
-          cd custom_components
-          zip -r ../shielddns.zip shielddns
-          cd ..
+          zip -r shielddns.zip custom_components/shielddns
 
       - name: Download Release Body Artifact
         uses: actions/download-artifact@v8
