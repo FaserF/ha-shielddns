@@ -33,3 +33,5 @@ dist/
 *linter*.txt
 /pytest_homeassistant_custom_component
 out.txt
+
+*.pyc
