@@ -274,10 +274,32 @@ async def hass(event_loop: asyncio.AbstractEventLoop) -> Any:
 
     mock_session = MagicMock(spec=aiohttp.ClientSession)
     mock_session.close = AsyncMock()
+
+    # Default mock API data returned by the client
+    _default_api_data: dict[str, Any] = {
+        "TotalQueries": 1000,
+        "BlockedQueries": 250,
+        "CacheHits": 150,
+        "AverageLatency": 12.5,
+        "UniqueClients": 5,
+        "enabled": True,
+    }
+
+    async def _mock_api_wrapper(
+        method: str, url: str, data: dict | None = None, headers: dict | None = None
+    ) -> Any:
+        return _default_api_data
+
     try:
-        with patch(
-            "homeassistant.helpers.aiohttp_client.async_get_clientsession",
-            return_value=mock_session,
+        with (
+            patch(
+                "homeassistant.helpers.aiohttp_client.async_get_clientsession",
+                return_value=mock_session,
+            ),
+            patch(
+                "custom_components.shielddns.client.ShieldDNSApiClient._api_wrapper",
+                side_effect=_mock_api_wrapper,
+            ),
         ):
             yield hass_obj
     finally:
