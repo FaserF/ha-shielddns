@@ -272,7 +272,8 @@ async def hass(event_loop: asyncio.AbstractEventLoop) -> Any:
     # Patch aiohttp session so the zeroconf / DNS resolver chain is never hit
     import aiohttp
 
-    mock_session = aiohttp.ClientSession(loop=event_loop)
+    mock_session = MagicMock(spec=aiohttp.ClientSession)
+    mock_session.close = AsyncMock()
     try:
         with patch(
             "homeassistant.helpers.aiohttp_client.async_get_clientsession",
@@ -280,7 +281,7 @@ async def hass(event_loop: asyncio.AbstractEventLoop) -> Any:
         ):
             yield hass_obj
     finally:
-        await mock_session.close()
+        pass
 
 
 @pytest.fixture(autouse=True)
