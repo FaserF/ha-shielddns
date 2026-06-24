@@ -1,6 +1,7 @@
 # <img src="custom_components/shielddns/brand/logo.png" height="50"> ShieldDNS for Home Assistant
 
 [![GitHub Release](https://img.shields.io/github/release/FaserF/ha-shielddns.svg?style=flat-square)](https://github.com/FaserF/ha-shielddns/releases)
+[![Downloads (Current release)](https://img.shields.io/github/downloads/FaserF/ha-shielddns/latest/shielddns.zip?label=Downloads%20(Current%20release)&style=flat-square)](https://github.com/FaserF/ha-shielddns/releases)
 [![License](https://img.shields.io/github/license/FaserF/ha-shielddns.svg?style=flat-square)](LICENSE)
 [![hacs](https://img.shields.io/badge/HACS-custom-orange.svg?style=flat-square)](https://hacs.xyz)
 [![CI Orchestrator](https://github.com/FaserF/ha-shielddns/actions/workflows/ci-orchestrator.yml/badge.svg)](https://github.com/FaserF/ha-shielddns/actions/workflows/ci-orchestrator.yml)
