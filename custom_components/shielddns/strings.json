@@ -11,6 +11,13 @@
           "use_ssl": "Use HTTPS (SSL/TLS)",
           "verify_ssl": "Verify SSL Certificate"
         }
+      },
+      "hassio_confirm": {
+        "title": "Set up ShieldDNS via Supervisor",
+        "description": "Do you want to set up ShieldDNS addon ({addon})? You will need to enter your ShieldDNS API Token.",
+        "data": {
+          "token": "API Token"
+        }
       }
     },
     "error": {

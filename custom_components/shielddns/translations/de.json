@@ -11,6 +11,13 @@
           "use_ssl": "HTTPS verwenden (SSL/TLS)",
           "verify_ssl": "SSL-Zertifikat prüfen"
         }
+      },
+      "hassio_confirm": {
+        "title": "ShieldDNS über Supervisor einrichten",
+        "description": "Möchten Sie das ShieldDNS-Addon ({addon}) einrichten? Sie müssen Ihr ShieldDNS-API-Token eingeben.",
+        "data": {
+          "token": "API-Token"
+        }
       }
     },
     "error": {

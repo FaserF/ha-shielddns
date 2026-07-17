@@ -28,6 +28,7 @@ from .const import (
     DEFAULT_PORT,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
+    LOGGER,
 )
 
 
@@ -48,7 +49,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     return {"title": f"ShieldDNS ({data[CONF_HOST]})"}
 
 
-class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):
+class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
     """Handle a config flow for ShieldDNS."""
 
     VERSION = 1
@@ -118,6 +119,7 @@ class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):
         port = DEFAULT_PORT
         try:
             from homeassistant.components.hassio import AddonManager
+
             addon_manager = AddonManager(self.hass, LOGGER, matched_slug, "ShieldDNS")
             addon_info = await addon_manager.async_get_addon_info()
             if addon_info.options:

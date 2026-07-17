@@ -154,7 +154,8 @@ async def hass(event_loop: asyncio.AbstractEventLoop) -> Any:
 
     def _mock_get(entity_id: str) -> MagicMock:
         s = MagicMock()
-        s.attributes: dict[str, Any] = {}
+        attrs: dict[str, Any] = {}
+        s.attributes = attrs
         for key, val in _mock_states.items():
             if key in entity_id:
                 s.state = val
