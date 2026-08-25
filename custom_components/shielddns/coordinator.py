@@ -80,9 +80,15 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             data = {
                 "stats": stats,
                 "filtering_status": filtering_status,
-                "clients": clients if not isinstance(clients, Exception) and clients else [],
-                "top_blocked": top_blocked if not isinstance(top_blocked, Exception) and top_blocked else [],
-                "top_clients": top_clients if not isinstance(top_clients, Exception) and top_clients else [],
+                "clients": clients
+                if not isinstance(clients, Exception) and clients
+                else [],
+                "top_blocked": top_blocked
+                if not isinstance(top_blocked, Exception) and top_blocked
+                else [],
+                "top_clients": top_clients
+                if not isinstance(top_clients, Exception) and top_clients
+                else [],
             }
             LOGGER.debug("ShieldDNS data update: %s", data)
             return data
