@@ -1,5 +1,6 @@
 """DataUpdateCoordinator for ShieldDNS."""
 
+import asyncio
 from datetime import timedelta
 from typing import Any
 
