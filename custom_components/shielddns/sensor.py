@@ -246,6 +246,34 @@ SENSORS: tuple[ShieldDNSSensorEntityDescription, ...] = (
             and (tc.get("client_alias") or tc.get("client_ip"))
         ),
     ),
+    ShieldDNSSensorEntityDescription(
+        key="cluster_role",
+        name="Cluster Role",
+        translation_key="cluster_role",
+        icon="mdi:server-network",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        required_version="1.10.0",
+        value_fn=lambda data: data.get("cluster", {}).get("role", "standalone"),
+    ),
+    ShieldDNSSensorEntityDescription(
+        key="cluster_node_type",
+        name="Cluster Node Type",
+        translation_key="cluster_node_type",
+        icon="mdi:server-security",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        required_version="1.10.0",
+        value_fn=lambda data: data.get("cluster", {}).get("instance_type", "private"),
+    ),
+    ShieldDNSSensorEntityDescription(
+        key="cluster_replicas",
+        name="Connected Replicas",
+        translation_key="cluster_replicas",
+        icon="mdi:server-plus",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
+        required_version="1.10.0",
+        value_fn=lambda data: len(data.get("cluster", {}).get("replicas", [])),
+    ),
 )
 
 
@@ -281,6 +309,25 @@ class ShieldDNSSensor(ShieldDNSEntity, SensorEntity):
         super().__init__(coordinator, entry_id)
         self.entity_description = description
         self._attr_unique_id = f"{entry_id}_{description.key}"
+
+    @property
+    def entity_registry_enabled_default(self) -> bool:
+        """Determine if sensor should be enabled by default based on instance role and mode."""
+        if self.entity_description.entity_registry_enabled_default is False:
+            return False
+
+        cluster = self.coordinator.data.get("cluster", {}) if self.coordinator.data else {}
+        role = cluster.get("role", "standalone")
+        node_type = cluster.get("instance_type", "private")
+
+        # Cluster-specific sensors
+        if self.entity_description.key in ("cluster_role", "cluster_node_type"):
+            return role in ("primary", "replica")
+        if self.entity_description.key == "cluster_replicas":
+            return role == "primary"
+
+        # In pure private mode, public internet-specific stats or items can default appropriately
+        return True
 
     @property
     def native_value(self) -> Any:

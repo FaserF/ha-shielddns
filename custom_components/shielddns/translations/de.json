@@ -89,6 +89,15 @@
       },
       "top_client": {
         "name": "Aktivster Client"
+      },
+      "cluster_role": {
+        "name": "Cluster-Rolle"
+      },
+      "cluster_node_type": {
+        "name": "Knoten-Typ"
+      },
+      "cluster_replicas": {
+        "name": "Verbundene Replikate"
       }
     },
     "binary_sensor": {
@@ -100,6 +109,12 @@
       },
       "dns_health": {
         "name": "DNS-Server Status"
+      },
+      "cluster_connected": {
+        "name": "Cluster-Verbindung"
+      },
+      "cluster_failover_mode": {
+        "name": "Cluster-Failover-Modus"
       }
     },
     "switch": {
@@ -119,6 +134,9 @@
       },
       "recheck_upstreams": {
         "name": "Upstreams neu prüfen"
+      },
+      "cluster_sync": {
+        "name": "Cluster-Konfiguration synchronisieren"
       }
     },
     "update": {

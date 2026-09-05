@@ -51,6 +51,22 @@ BINARY_SENSORS: tuple[ShieldDNSBinarySensorEntityDescription, ...] = (
         required_version="1.6.0",
         is_on_fn=lambda data: data.get("stats", {}).get("coredns_alive", True),
     ),
+    ShieldDNSBinarySensorEntityDescription(
+        key="cluster_connected",
+        translation_key="cluster_connected",
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
+        required_version="1.10.0",
+        is_on_fn=lambda data: not data.get("cluster", {}).get("connection_lost", False)
+        if data.get("cluster", {}).get("role") == "replica"
+        else True,
+    ),
+    ShieldDNSBinarySensorEntityDescription(
+        key="cluster_failover_mode",
+        translation_key="cluster_failover_mode",
+        device_class=None,
+        required_version="1.10.0",
+        is_on_fn=lambda data: data.get("cluster", {}).get("failover_mode", False),
+    ),
 )
 
 
@@ -86,6 +102,23 @@ class ShieldDNSBinarySensor(ShieldDNSEntity, BinarySensorEntity):
         super().__init__(coordinator, entry_id)
         self.entity_description = description
         self._attr_unique_id = f"{entry_id}_{description.key}"
+
+    @property
+    def entity_registry_enabled_default(self) -> bool:
+        """Determine if binary sensor should be enabled by default based on instance role and mode."""
+        if self.entity_description.entity_registry_enabled_default is False:
+            return False
+
+        cluster = self.coordinator.data.get("cluster", {}) if self.coordinator.data else {}
+        role = cluster.get("role", "standalone")
+
+        # Cluster connectivity and failover sensors are relevant for replica nodes
+        if self.entity_description.key == "cluster_connected":
+            return role == "replica"
+        if self.entity_description.key == "cluster_failover_mode":
+            return role == "replica"
+
+        return True
 
     @property
     def is_on(self) -> bool | None:

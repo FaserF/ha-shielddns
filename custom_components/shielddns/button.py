@@ -24,6 +24,7 @@ async def async_setup_entry(
             ShieldDNSReloadFiltersButton(coordinator, entry.entry_id),
             ShieldDNSClearLogsButton(coordinator, entry.entry_id),
             ShieldDNSRecheckUpstreamsButton(coordinator, entry.entry_id),
+            ShieldDNSClusterSyncButton(coordinator, entry.entry_id),
         ]
     )
 
@@ -106,3 +107,31 @@ class ShieldDNSRecheckUpstreamsButton(ShieldDNSEntity, ButtonEntity):
     async def async_press(self) -> None:
         """Press the button."""
         await self.coordinator.client.recheck_upstreams()
+
+
+class ShieldDNSClusterSyncButton(ShieldDNSEntity, ButtonEntity):
+    """Representation of a ShieldDNS Cluster Sync button."""
+
+    _attr_translation_key = "cluster_sync"
+    _attr_icon = "mdi:cloud-sync"
+
+    def __init__(
+        self,
+        coordinator: ShieldDNSDataUpdateCoordinator,
+        entry_id: str,
+    ) -> None:
+        """Initialize."""
+        super().__init__(coordinator, entry_id)
+        self._attr_unique_id = f"{entry_id}_cluster_sync"
+
+    @property
+    def entity_registry_enabled_default(self) -> bool:
+        """Only enable cluster sync button by default on replica nodes."""
+        cluster = self.coordinator.data.get("cluster", {}) if self.coordinator.data else {}
+        return cluster.get("role") == "replica"
+
+    async def async_press(self) -> None:
+        """Press the button."""
+        await self.coordinator.client.trigger_cluster_sync()
+        await self.coordinator.async_request_refresh()
+

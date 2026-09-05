@@ -165,3 +165,30 @@ class ShieldDNSApiClient:
             f"{self._base_url}/rules/add",
             data={"domain": domain, "type": "mapping", "ip": ip},
         )
+
+    async def get_cluster_status(self) -> dict[str, Any]:
+        """Get the current cluster and federation status."""
+        return await self._api_wrapper("GET", f"{self._base_url}/cluster/status")
+
+    async def trigger_cluster_sync(self) -> dict[str, Any]:
+        """Trigger an immediate configuration sync with the primary node."""
+        return await self._api_wrapper("POST", f"{self._base_url}/cluster/sync")
+
+    async def set_cluster_settings(
+        self,
+        role: str | None = None,
+        instance_type: str | None = None,
+        failover_mode: bool | None = None,
+        sync_interval: int | None = None,
+    ) -> dict[str, Any]:
+        """Update cluster configuration settings."""
+        data: dict[str, Any] = {}
+        if role is not None:
+            data["role"] = role
+        if instance_type is not None:
+            data["instance_type"] = instance_type
+        if failover_mode is not None:
+            data["failover_mode"] = failover_mode
+        if sync_interval is not None:
+            data["sync_interval"] = sync_interval
+        return await self._api_wrapper("POST", f"{self._base_url}/cluster/settings", data=data)

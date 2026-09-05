@@ -61,6 +61,7 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             clients_task = self.client.get_clients()
             top_blocked_task = self.client.get_top_blocked()
             top_clients_task = self.client.get_top_clients()
+            cluster_task = self.client.get_cluster_status()
 
             results = await asyncio.gather(
                 stats_task,
@@ -68,10 +69,11 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 clients_task,
                 top_blocked_task,
                 top_clients_task,
+                cluster_task,
                 return_exceptions=True,
             )
 
-            stats, filtering_status, clients, top_blocked, top_clients = results
+            stats, filtering_status, clients, top_blocked, top_clients, cluster = results
 
             if isinstance(stats, Exception):
                 raise stats
@@ -81,6 +83,9 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             data = {
                 "stats": stats,
                 "filtering_status": filtering_status,
+                "cluster": cluster
+                if not isinstance(cluster, Exception) and cluster
+                else {},
                 "clients": clients
                 if not isinstance(clients, Exception) and clients
                 else [],
