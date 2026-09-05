@@ -127,11 +127,12 @@ class ShieldDNSClusterSyncButton(ShieldDNSEntity, ButtonEntity):
     @property
     def entity_registry_enabled_default(self) -> bool:
         """Only enable cluster sync button by default on replica nodes."""
-        cluster = self.coordinator.data.get("cluster", {}) if self.coordinator.data else {}
+        cluster = (
+            self.coordinator.data.get("cluster", {}) if self.coordinator.data else {}
+        )
         return cluster.get("role") == "replica"
 
     async def async_press(self) -> None:
         """Press the button."""
         await self.coordinator.client.trigger_cluster_sync()
         await self.coordinator.async_request_refresh()
-

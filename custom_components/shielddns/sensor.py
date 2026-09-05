@@ -316,7 +316,9 @@ class ShieldDNSSensor(ShieldDNSEntity, SensorEntity):
         if self.entity_description.entity_registry_enabled_default is False:
             return False
 
-        cluster = self.coordinator.data.get("cluster", {}) if self.coordinator.data else {}
+        cluster = (
+            self.coordinator.data.get("cluster", {}) if self.coordinator.data else {}
+        )
         role = cluster.get("role", "standalone")
 
         # Cluster-specific sensors

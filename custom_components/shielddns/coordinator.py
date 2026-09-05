@@ -73,7 +73,9 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 return_exceptions=True,
             )
 
-            stats, filtering_status, clients, top_blocked, top_clients, cluster = results
+            stats, filtering_status, clients, top_blocked, top_clients, cluster = (
+                results
+            )
 
             if isinstance(stats, Exception):
                 raise stats

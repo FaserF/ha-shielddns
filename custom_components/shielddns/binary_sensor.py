@@ -56,9 +56,11 @@ BINARY_SENSORS: tuple[ShieldDNSBinarySensorEntityDescription, ...] = (
         translation_key="cluster_connected",
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         required_version="1.10.0",
-        is_on_fn=lambda data: not data.get("cluster", {}).get("connection_lost", False)
-        if data.get("cluster", {}).get("role") == "replica"
-        else True,
+        is_on_fn=lambda data: (
+            not data.get("cluster", {}).get("connection_lost", False)
+            if data.get("cluster", {}).get("role") == "replica"
+            else True
+        ),
     ),
     ShieldDNSBinarySensorEntityDescription(
         key="cluster_failover_mode",
@@ -109,7 +111,9 @@ class ShieldDNSBinarySensor(ShieldDNSEntity, BinarySensorEntity):
         if self.entity_description.entity_registry_enabled_default is False:
             return False
 
-        cluster = self.coordinator.data.get("cluster", {}) if self.coordinator.data else {}
+        cluster = (
+            self.coordinator.data.get("cluster", {}) if self.coordinator.data else {}
+        )
         role = cluster.get("role", "standalone")
 
         # Cluster connectivity and failover sensors are relevant for replica nodes

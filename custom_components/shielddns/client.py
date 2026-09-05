@@ -191,4 +191,6 @@ class ShieldDNSApiClient:
             data["failover_mode"] = failover_mode
         if sync_interval is not None:
             data["sync_interval"] = sync_interval
-        return await self._api_wrapper("POST", f"{self._base_url}/cluster/settings", data=data)
+        return await self._api_wrapper(
+            "POST", f"{self._base_url}/cluster/settings", data=data
+        )
