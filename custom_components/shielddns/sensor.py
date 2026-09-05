@@ -318,7 +318,6 @@ class ShieldDNSSensor(ShieldDNSEntity, SensorEntity):
 
         cluster = self.coordinator.data.get("cluster", {}) if self.coordinator.data else {}
         role = cluster.get("role", "standalone")
-        node_type = cluster.get("instance_type", "private")
 
         # Cluster-specific sensors
         if self.entity_description.key in ("cluster_role", "cluster_node_type"):
