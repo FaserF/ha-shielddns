@@ -110,3 +110,73 @@ set_domain_mapping:
       example: "192.168.1.10"
       selector:
         text:
+
+set_routing_rule:
+  name: Set DNS Routing Rule
+  description: Configure selective DNS routing for a specific domain or client IP.
+  target:
+    entity:
+      integration: shielddns
+  fields:
+    match:
+      name: Match Pattern
+      description: Domain name (e.g., internal.corp) or Client IP/CIDR (e.g., 192.168.1.50).
+      required: true
+      example: "internal.corp"
+      selector:
+        text:
+    target:
+      name: Routing Target
+      description: Target upstream mode (default, host, wireguard).
+      required: false
+      default: "default"
+      selector:
+        select:
+          options:
+            - "default"
+            - "host"
+            - "wireguard"
+    host_target:
+      name: Specific Host Endpoint
+      description: Destination upstream host (e.g., 10.0.0.1:53) when target is 'host'.
+      required: false
+      example: "10.0.0.1:53"
+      selector:
+        text:
+    wireguard_config:
+      name: WireGuard DNS Endpoint
+      description: WireGuard tunnel DNS gateway when target is 'wireguard'.
+      required: false
+      example: "10.200.0.1:53"
+      selector:
+        text:
+    name:
+      name: Rule Name
+      description: Optional friendly name for this routing rule.
+      required: false
+      example: "Work VPN Route"
+      selector:
+        text:
+    enabled:
+      name: Enabled
+      description: Whether the routing rule is active.
+      required: false
+      default: true
+      selector:
+        boolean:
+
+delete_routing_rule:
+  name: Delete DNS Routing Rule
+  description: Remove a policy-based DNS routing rule.
+  target:
+    entity:
+      integration: shielddns
+  fields:
+    match:
+      name: Match Pattern
+      description: The domain or client IP of the rule to delete.
+      required: true
+      example: "internal.corp"
+      selector:
+        text:
+

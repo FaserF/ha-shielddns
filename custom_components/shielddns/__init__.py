@@ -34,6 +34,8 @@ SERVICE_REMOVE_RULE = "remove_rule"
 SERVICE_SET_CLIENT_ALIAS = "set_client_alias"
 SERVICE_BLOCK_CLIENT = "block_client"
 SERVICE_SET_DOMAIN_MAPPING = "set_domain_mapping"
+SERVICE_SET_ROUTING_RULE = "set_routing_rule"
+SERVICE_DELETE_ROUTING_RULE = "delete_routing_rule"
 
 DOMAIN_SCHEMA = vol.Schema(
     {
@@ -59,6 +61,26 @@ DOMAIN_MAPPING_SCHEMA = vol.Schema(
     {
         vol.Required("domain"): cv.string,
         vol.Required("ip"): cv.string,
+    }
+)
+
+ROUTING_RULE_SCHEMA = vol.Schema(
+    {
+        vol.Required("match"): cv.string,
+        vol.Optional("target", default="default"): vol.In(
+            ["default", "host", "wireguard"]
+        ),
+        vol.Optional("match_type"): vol.In(["domain", "client_ip"]),
+        vol.Optional("host_target"): cv.string,
+        vol.Optional("wireguard_config"): cv.string,
+        vol.Optional("name"): cv.string,
+        vol.Optional("enabled", default=True): cv.boolean,
+    }
+)
+
+DELETE_ROUTING_RULE_SCHEMA = vol.Schema(
+    {
+        vol.Required("match"): cv.string,
     }
 )
 
@@ -132,6 +154,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         for _entry_id, coord in hass.data[DOMAIN].items():
             await coord.client.set_domain_mapping(call.data["domain"], call.data["ip"])
 
+    async def async_set_routing_rule(call: ServiceCall) -> None:
+        """Set a routing rule via ShieldDNS."""
+        for _entry_id, coord in hass.data[DOMAIN].items():
+            await coord.client.set_routing_rule(
+                match=call.data["match"],
+                target=call.data.get("target", "default"),
+                match_type=call.data.get("match_type"),
+                host_target=call.data.get("host_target"),
+                wireguard_config=call.data.get("wireguard_config"),
+                name=call.data.get("name"),
+                enabled=call.data.get("enabled", True),
+            )
+
+    async def async_delete_routing_rule(call: ServiceCall) -> None:
+        """Delete a routing rule via ShieldDNS."""
+        for _entry_id, coord in hass.data[DOMAIN].items():
+            await coord.client.delete_routing_rule(call.data["match"])
+
     if not hass.services.has_service(DOMAIN, SERVICE_BLOCK_DOMAIN):
         hass.services.async_register(
             DOMAIN, SERVICE_BLOCK_DOMAIN, async_block_domain, schema=DOMAIN_SCHEMA
@@ -162,6 +202,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             async_set_domain_mapping,
             schema=DOMAIN_MAPPING_SCHEMA,
         )
+    if not hass.services.has_service(DOMAIN, SERVICE_SET_ROUTING_RULE):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_SET_ROUTING_RULE,
+            async_set_routing_rule,
+            schema=ROUTING_RULE_SCHEMA,
+        )
+    if not hass.services.has_service(DOMAIN, SERVICE_DELETE_ROUTING_RULE):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_DELETE_ROUTING_RULE,
+            async_delete_routing_rule,
+            schema=DELETE_ROUTING_RULE_SCHEMA,
+        )
 
     return True
 
@@ -178,6 +232,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.services.async_remove(DOMAIN, SERVICE_SET_CLIENT_ALIAS)
         hass.services.async_remove(DOMAIN, SERVICE_BLOCK_CLIENT)
         hass.services.async_remove(DOMAIN, SERVICE_SET_DOMAIN_MAPPING)
+        hass.services.async_remove(DOMAIN, SERVICE_SET_ROUTING_RULE)
+        hass.services.async_remove(DOMAIN, SERVICE_DELETE_ROUTING_RULE)
 
     return unload_ok
 

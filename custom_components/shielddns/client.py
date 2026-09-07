@@ -194,3 +194,41 @@ class ShieldDNSApiClient:
         return await self._api_wrapper(
             "POST", f"{self._base_url}/cluster/settings", data=data
         )
+
+    async def get_routing_rules(self) -> dict[str, Any]:
+        """Get all configured policy-based routing rules."""
+        return await self._api_wrapper("GET", f"{self._base_url}/routing/rules")
+
+    async def set_routing_rule(
+        self,
+        match: str,
+        target: str = "default",
+        match_type: str | None = None,
+        host_target: str | None = None,
+        wireguard_config: str | None = None,
+        name: str | None = None,
+        enabled: bool = True,
+    ) -> dict[str, Any]:
+        """Create or update a policy-based DNS routing rule."""
+        data: dict[str, Any] = {
+            "match": match,
+            "target": target,
+            "enabled": enabled,
+        }
+        if match_type is not None:
+            data["match_type"] = match_type
+        if host_target is not None:
+            data["host_target"] = host_target
+        if wireguard_config is not None:
+            data["wireguard_config"] = wireguard_config
+        if name is not None:
+            data["name"] = name
+        return await self._api_wrapper(
+            "POST", f"{self._base_url}/routing/rules", data=data
+        )
+
+    async def delete_routing_rule(self, match: str) -> dict[str, Any]:
+        """Delete a policy-based routing rule."""
+        return await self._api_wrapper(
+            "DELETE", f"{self._base_url}/routing/rules?match={match}"
+        )

@@ -71,3 +71,35 @@ async def test_services(hass: HomeAssistant) -> None:
             blocking=True,
         )
         mock_remove_rule.assert_called_once_with("ads.com")
+
+    with patch(
+        "custom_components.shielddns.client.ShieldDNSApiClient.set_routing_rule",
+        new_callable=AsyncMock,
+    ) as mock_set_routing:
+        await hass.services.async_call(
+            DOMAIN,
+            "set_routing_rule",
+            {"match": "corp.internal", "target": "host", "host_target": "10.0.0.1:53"},
+            blocking=True,
+        )
+        mock_set_routing.assert_called_once_with(
+            match="corp.internal",
+            target="host",
+            match_type=None,
+            host_target="10.0.0.1:53",
+            wireguard_config=None,
+            name=None,
+            enabled=True,
+        )
+
+    with patch(
+        "custom_components.shielddns.client.ShieldDNSApiClient.delete_routing_rule",
+        new_callable=AsyncMock,
+    ) as mock_del_routing:
+        await hass.services.async_call(
+            DOMAIN,
+            "delete_routing_rule",
+            {"match": "corp.internal"},
+            blocking=True,
+        )
+        mock_del_routing.assert_called_once_with("corp.internal")
