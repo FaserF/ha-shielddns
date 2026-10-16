@@ -66,6 +66,9 @@ class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
         """Handle the initial step."""
         errors: dict[str, str] = {}
         if user_input is not None:
+            unique_id = f"{user_input[CONF_HOST]}:{user_input[CONF_PORT]}"
+            await self.async_set_unique_id(unique_id)
+            self._abort_if_unique_id_configured()
             self._async_abort_entries_match(
                 {CONF_HOST: user_input[CONF_HOST], CONF_PORT: user_input[CONF_PORT]}
             )
@@ -120,7 +123,7 @@ class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
         try:
             from homeassistant.components.hassio import AddonManager
 
-            addon_manager = AddonManager(self.hass, LOGGER, matched_slug, "ShieldDNS")
+            addon_manager = AddonManager(self.hass, LOGGER, "ShieldDNS", matched_slug)
             addon_info = await addon_manager.async_get_addon_info()
             if addon_info.options:
                 port = addon_info.options.get("doh_port", DEFAULT_PORT)
@@ -129,6 +132,20 @@ class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
 
         self._host = host
         self._port = port
+
+        # Abort if already configured for this addon or local host
+        for entry in self._async_current_entries():
+            entry_host = entry.data.get(CONF_HOST, "")
+            entry_port = entry.data.get(CONF_PORT)
+            if (
+                entry.unique_id in (f"{matched_slug}_{port}", matched_slug, f"{matched_slug}_{DEFAULT_PORT}")
+                or entry_host in ("127.0.0.1", "localhost", host, matched_slug)
+            ):
+                if not entry.unique_id:
+                    self.hass.config_entries.async_update_entry(
+                        entry, unique_id=f"{matched_slug}_{port}"
+                    )
+                return self.async_abort(reason="already_configured")
 
         await self.async_set_unique_id(f"{matched_slug}_{port}")
         self._abort_if_unique_id_configured()
