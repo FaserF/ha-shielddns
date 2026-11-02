@@ -1,9 +1,9 @@
-# <img src="custom_components/shielddns/brand/logo.png" height="50"> ShieldDNS for Home Assistant
+﻿# <img src="custom_components/shielddns/brand/logo.png" height="50"> ShieldDNS for Home Assistant
 
 [![GitHub Release](https://img.shields.io/github/release/FaserF/ha-shielddns.svg?style=flat-square)](https://github.com/FaserF/ha-shielddns/releases)
 [![Downloads (Current release)](https://img.shields.io/github/downloads/FaserF/ha-shielddns/latest/shielddns.zip?label=Downloads%20(Current%20release)&style=flat-square)](https://github.com/FaserF/ha-shielddns/releases)
 [![License](https://img.shields.io/github/license/FaserF/ha-shielddns.svg?style=flat-square)](LICENSE)
-[![hacs](https://img.shields.io/badge/HACS-custom-orange.svg?style=flat-square)](https://hacs.xyz)
+[![Home Assistant Marketplace](https://img.shields.io/badge/Home_Assistant-Marketplace-41BDF5.svg?style=flat-square&logo=homeassistant&logoColor=white)](https://www.home-assistant.io)
 [![CI Orchestrator](https://github.com/FaserF/ha-shielddns/actions/workflows/ci-orchestrator.yml/badge.svg)](https://github.com/FaserF/ha-shielddns/actions/workflows/ci-orchestrator.yml)
 [![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen.svg?style=flat-square)](https://renovatebot.com)
 
@@ -16,7 +16,7 @@ Monitor and manage your privately hosted [ShieldDNS](https://github.com/FaserF/S
 | [✨ Features](#-features) | [📦 Installation](#-installation) | [⚙️ Configuration](#️-configuration) | [🧱 Entities](#-entities) |
 | [📖 Automations](#-automation-examples) | [❓ FAQ](#-troubleshooting--faq) | [🧑‍💻 Development](#-development) | |
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=FaserF&repository=ha-shielddns&category=integration)
+[![Open your Home Assistant instance and open the repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=FaserF&repository=ha-shielddns&category=integration)
 
 ### Why use this integration?
 ShieldDNS provides high-performance encrypted DoH/DoT DNS resolution with powerful ad and malware blocking. This integration provides **native monitoring** via the ShieldDNS API, allowing you to track daily queries, view how many ads were blocked, and control the entire protection mechanism (On/Off) instantly from your Home Assistant dashboard.
@@ -73,15 +73,15 @@ No manual script-polling or complex setup is required — everything is handled 
 
 | Device / Service | Integration Use Case | Link |
 | :--- | :--- | :--- |
-| **OpenWrt-kompatible Wi-Fi 6/7 Router & Gateways** | Native Ubus/RPC, WireGuard, SQM & Präsenz-Erkennung in Home Assistant | [Offizielle Geräte-Seite →](https://fabiseitz.de/go/ha-router) |
-| **Home Assistant Green / Yellow Zentrale** | Dedizierter, stromsparender 24/7 Smart-Home-Host | [Offizielle Geräte-Seite →](https://fabiseitz.de/go/ha-hardware) |
+| **OpenWrt-compatible Wi-Fi 6/7 Routers & Gateways** | Native Ubus/RPC, WireGuard, SQM & presence detection in Home Assistant | [Official Device Page →](https://fabiseitz.de/go/ha-router) |
+| **Home Assistant Green / Yellow Hub** | Dedicated, power-efficient 24/7 smart home appliance | [Official Device Page →](https://fabiseitz.de/go/ha-hardware) |
 
 
 ## 📦 Installation
 
-### HACS (Recommended)
+### Home Assistant Marketplace (Recommended)
 
-1. Open HACS in Home Assistant.
+1. Open Marketplace in Home Assistant.
 2. Click the three dots -> **Custom repositories**.
 3. Add `FaserF/ha-shielddns` with category **Integration**.
 4. Search for **ShieldDNS**.
