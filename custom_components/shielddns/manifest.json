@@ -1,6 +1,9 @@
 {
   "domain": "shielddns",
   "name": "ShieldDNS",
+  "categories": [
+    "computers_network"
+  ],
   "codeowners": [
     "@FaserF"
   ],

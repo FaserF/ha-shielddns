@@ -176,15 +176,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     if not hass.services.has_service(DOMAIN, SERVICE_BLOCK_DOMAIN):
         hass.services.async_register(
-            DOMAIN, SERVICE_BLOCK_DOMAIN, async_block_domain, schema=cast(Any, DOMAIN_SCHEMA)
+            DOMAIN,
+            SERVICE_BLOCK_DOMAIN,
+            async_block_domain,
+            schema=cast(Any, DOMAIN_SCHEMA),
         )
     if not hass.services.has_service(DOMAIN, SERVICE_ALLOW_DOMAIN):
         hass.services.async_register(
-            DOMAIN, SERVICE_ALLOW_DOMAIN, async_allow_domain, schema=cast(Any, DOMAIN_SCHEMA)
+            DOMAIN,
+            SERVICE_ALLOW_DOMAIN,
+            async_allow_domain,
+            schema=cast(Any, DOMAIN_SCHEMA),
         )
     if not hass.services.has_service(DOMAIN, SERVICE_REMOVE_RULE):
         hass.services.async_register(
-            DOMAIN, SERVICE_REMOVE_RULE, async_remove_rule, schema=cast(Any, DOMAIN_SCHEMA)
+            DOMAIN,
+            SERVICE_REMOVE_RULE,
+            async_remove_rule,
+            schema=cast(Any, DOMAIN_SCHEMA),
         )
     if not hass.services.has_service(DOMAIN, SERVICE_SET_CLIENT_ALIAS):
         hass.services.async_register(
@@ -195,7 +204,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
     if not hass.services.has_service(DOMAIN, SERVICE_BLOCK_CLIENT):
         hass.services.async_register(
-            DOMAIN, SERVICE_BLOCK_CLIENT, async_block_client, schema=cast(Any, CLIENT_BLOCK_SCHEMA)
+            DOMAIN,
+            SERVICE_BLOCK_CLIENT,
+            async_block_client,
+            schema=cast(Any, CLIENT_BLOCK_SCHEMA),
         )
     if not hass.services.has_service(DOMAIN, SERVICE_SET_DOMAIN_MAPPING):
         hass.services.async_register(
