@@ -359,7 +359,10 @@ def main():
         out.append(">")
         for item in buckets["breaking"]:
             formatted = get_formatted_item(
-                item["display"], item["hashes"], repo, commit_authors
+                cast(str, item["display"]),
+                cast(list, item["hashes"]),
+                repo,
+                commit_authors,
             )
             out.append(f"> - {formatted}")
         out.append("")

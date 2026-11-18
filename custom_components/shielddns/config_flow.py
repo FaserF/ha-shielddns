@@ -1,6 +1,6 @@
 """Config flow for ShieldDNS integration."""
 
-from typing import Any
+from typing import Any, cast
 
 import voluptuous as vol
 from homeassistant.config_entries import (
@@ -85,7 +85,7 @@ class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema(
+            data_schema=cast(Any, vol.Schema(
                 {
                     vol.Required(CONF_HOST): str,
                     vol.Required(CONF_PORT, default=DEFAULT_PORT): int,
@@ -93,7 +93,7 @@ class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
                     vol.Optional(CONF_USE_SSL, default=True): bool,
                     vol.Optional(CONF_VERIFY_SSL, default=True): bool,
                 }
-            ),
+            )),
             errors=errors,
             description_placeholders={
                 "docs_url": "https://github.com/FaserF/ha-shielddns"
@@ -175,7 +175,7 @@ class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
 
         return self.async_show_form(
             step_id="hassio_confirm",
-            data_schema=vol.Schema({vol.Required(CONF_TOKEN): str}),
+            data_schema=cast(Any, vol.Schema({vol.Required(CONF_TOKEN): str})),
             errors=errors,
             description_placeholders={"addon": self._addon_slug or ""},
         )
@@ -201,7 +201,7 @@ class ShieldDNSOptionsFlowHandler(OptionsFlow):
 
         return self.async_show_form(
             step_id="init",
-            data_schema=vol.Schema(
+            data_schema=cast(Any, vol.Schema(
                 {
                     vol.Required(
                         CONF_TOKEN,
@@ -216,5 +216,5 @@ class ShieldDNSOptionsFlowHandler(OptionsFlow):
                         ),
                     ): vol.All(vol.Coerce(int), vol.Range(min=1)),
                 }
-            ),
+            )),
         )
