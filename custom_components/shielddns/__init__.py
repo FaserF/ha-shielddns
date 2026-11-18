@@ -1,13 +1,13 @@
 """The ShieldDNS integration."""
 
+from typing import Any, cast
+
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-
-from typing import Any, cast
 
 from .client import ShieldDNSApiClient
 from .const import (
@@ -39,11 +39,14 @@ SERVICE_SET_DOMAIN_MAPPING = "set_domain_mapping"
 SERVICE_SET_ROUTING_RULE = "set_routing_rule"
 SERVICE_DELETE_ROUTING_RULE = "delete_routing_rule"
 
-DOMAIN_SCHEMA = cast(Any, vol.Schema(
-    {
-        vol.Required("domain"): cv.string,
-    }
-))
+DOMAIN_SCHEMA = cast(
+    Any,
+    vol.Schema(
+        {
+            vol.Required("domain"): cv.string,
+        }
+    ),
+)
 
 CLIENT_ALIAS_SCHEMA = vol.Schema(
     {
