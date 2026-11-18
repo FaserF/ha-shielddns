@@ -26,7 +26,7 @@ class ShieldDNSEntity(CoordinatorEntity[ShieldDNSDataUpdateCoordinator]):
         """Return device information."""
         version = "Unknown"
         if self.coordinator.data and "stats" in self.coordinator.data:
-             version = self.coordinator.data["stats"].get("version", "Unknown")
+            version = self.coordinator.data["stats"].get("version", "Unknown")
         return DeviceInfo(
             identifiers={(DOMAIN, self.entry_id)},
             name=f"ShieldDNS ({self.coordinator.host})",

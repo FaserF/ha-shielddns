@@ -5,7 +5,7 @@ import argparse
 import re
 import subprocess
 import sys
-from typing import Any, Sequence, cast
+from typing import Any, cast
 
 # Noise filter — commits matching ANY pattern are silently dropped
 NOISE_PATTERNS = [
