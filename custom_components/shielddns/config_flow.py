@@ -85,15 +85,18 @@ class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
 
         return self.async_show_form(
             step_id="user",
-            data_schema=cast(Any, vol.Schema(
-                {
-                    vol.Required(CONF_HOST): str,
-                    vol.Required(CONF_PORT, default=DEFAULT_PORT): int,
-                    vol.Required(CONF_TOKEN): str,
-                    vol.Optional(CONF_USE_SSL, default=True): bool,
-                    vol.Optional(CONF_VERIFY_SSL, default=True): bool,
-                }
-            )),
+            data_schema=cast(
+                Any,
+                vol.Schema(
+                    {
+                        vol.Required(CONF_HOST): str,
+                        vol.Required(CONF_PORT, default=DEFAULT_PORT): int,
+                        vol.Required(CONF_TOKEN): str,
+                        vol.Optional(CONF_USE_SSL, default=True): bool,
+                        vol.Optional(CONF_VERIFY_SSL, default=True): bool,
+                    }
+                ),
+            ),
             errors=errors,
             description_placeholders={
                 "docs_url": "https://github.com/FaserF/ha-shielddns"
@@ -201,20 +204,23 @@ class ShieldDNSOptionsFlowHandler(OptionsFlow):
 
         return self.async_show_form(
             step_id="init",
-            data_schema=cast(Any, vol.Schema(
-                {
-                    vol.Required(
-                        CONF_TOKEN,
-                        default=self.config_entry.options.get(
-                            CONF_TOKEN, self.config_entry.data.get(CONF_TOKEN)
-                        ),
-                    ): str,
-                    vol.Required(
-                        CONF_UPDATE_INTERVAL,
-                        default=self.config_entry.options.get(
-                            CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
-                        ),
-                    ): vol.All(vol.Coerce(int), vol.Range(min=1)),
-                }
-            )),
+            data_schema=cast(
+                Any,
+                vol.Schema(
+                    {
+                        vol.Required(
+                            CONF_TOKEN,
+                            default=self.config_entry.options.get(
+                                CONF_TOKEN, self.config_entry.data.get(CONF_TOKEN)
+                            ),
+                        ): str,
+                        vol.Required(
+                            CONF_UPDATE_INTERVAL,
+                            default=self.config_entry.options.get(
+                                CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
+                            ),
+                        ): vol.All(vol.Coerce(int), vol.Range(min=1)),
+                    }
+                ),
+            ),
         )
