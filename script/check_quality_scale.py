@@ -229,8 +229,8 @@ def main() -> int:
         )
 
     if errors:
-        for err in errors:
-            print(f"{qs_path.name}: {err}", file=sys.stderr)
+        for error in errors:
+            print(f"{qs_path.name}: {error}", file=sys.stderr)
         return 1
 
     print(

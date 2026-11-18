@@ -5,6 +5,7 @@ import argparse
 import re
 import subprocess
 import sys
+from typing import Any, Sequence, cast
 
 # Noise filter — commits matching ANY pattern are silently dropped
 NOISE_PATTERNS = [
@@ -184,8 +185,8 @@ def main():
     except ValueError:
         total_raw = len(commit_lines)
 
-    buckets = {k: [] for k in CATEGORY_ORDER}
-    seen_items = {}
+    buckets: dict[str, list[dict[str, Any]]] = {k: [] for k in CATEGORY_ORDER}
+    seen_items: dict[str, dict[str, Any]] = {}
 
     for line in commit_lines:
         author = ""
@@ -215,7 +216,7 @@ def main():
         if any(re.search(p, msg) for p in NOISE_PATTERNS):
             continue
 
-        bucket = "other"
+        bucket_name = "other"
         display = msg
         is_break = False
 
@@ -232,9 +233,9 @@ def main():
             desc = conv_match.group(4).strip()
 
             if raw_scope and raw_scope in SCOPE_MAP:
-                bucket = SCOPE_MAP[raw_scope]
+                bucket_name = SCOPE_MAP[raw_scope]
             elif raw_type in TYPE_MAP:
-                bucket = TYPE_MAP[raw_type]
+                bucket_name = TYPE_MAP[raw_type]
 
             desc_cap = desc[0].upper() + desc[1:] if desc else desc
             display = f"**{raw_scope}:** {desc_cap}" if raw_scope else desc_cap
@@ -245,7 +246,7 @@ def main():
                 w in msg_lower
                 for w in ["general fix", "small fix", "bug fix", "fixes", "fixed"]
             ) or re.search(r"\bfix(es|ed)?\b", msg_lower):
-                bucket = "fix"
+                bucket_name = "fix"
             elif any(
                 w in msg_lower
                 for w in [
@@ -259,7 +260,7 @@ def main():
                     "changelog",
                 ]
             ):
-                bucket = "ci"
+                bucket_name = "ci"
             elif any(
                 w in msg_lower
                 for w in [
@@ -270,7 +271,7 @@ def main():
                     "upgrade dep",
                 ]
             ):
-                bucket = "chore"
+                bucket_name = "chore"
             elif any(
                 w in msg_lower
                 for w in [
@@ -282,13 +283,13 @@ def main():
                     "introduce",
                 ]
             ) or msg_lower.startswith(("add ", "adds ", "expose ", "exposed ")):
-                bucket = "feat"
+                bucket_name = "feat"
             elif any(
                 w in msg_lower for w in ["security", "vulnerability", "cve", "auth"]
             ):
-                bucket = "security"
+                bucket_name = "security"
             elif any(w in msg_lower for w in ["perf", "speed", "faster", "optim"]):
-                bucket = "perf"
+                bucket_name = "perf"
             elif (
                 "refactor" in msg_lower
                 or "cleanup" in msg_lower
@@ -298,11 +299,11 @@ def main():
                     ("filter ", "use ", "remove ", "avoid ", "robust ")
                 )
             ):
-                bucket = "refactor"
+                bucket_name = "refactor"
             elif any(w in msg_lower for w in ["doc", "readme", "wiki", "guide"]):
-                bucket = "docs"
+                bucket_name = "docs"
             elif any(w in msg_lower for w in ["test", "spec", "unit test"]):
-                bucket = "test"
+                bucket_name = "test"
             elif any(
                 w in msg_lower
                 for w in [
@@ -316,7 +317,7 @@ def main():
                     "lang",
                 ]
             ):
-                bucket = "ui"
+                bucket_name = "ui"
 
         norm_key = get_norm_key(display)
 
@@ -343,7 +344,7 @@ def main():
 
         item = {"display": display, "hashes": [commit_hash] if commit_hash else []}
         seen_items[norm_key] = item
-        buckets[bucket].append(item)
+        buckets[bucket_name].append(item)
 
     out = []
     has_any = False
@@ -366,38 +367,47 @@ def main():
     for key in CATEGORY_ORDER:
         if key == "breaking":
             continue
-        bucket = buckets[key]
-        if not bucket:
+        bucket_list: list[dict[str, Any]] = buckets[key]
+        if not bucket_list:
             continue
         has_any = True
 
         out.append(f"### {CATEGORY_EMOJI[key]}")
         out.append("")
 
-        collapse = (len(bucket) > MAX_PER_SECTION) and (key not in NEVER_COLLAPSE)
+        collapse = (len(bucket_list) > MAX_PER_SECTION) and (key not in NEVER_COLLAPSE)
 
         if collapse:
             for i in range(MAX_PER_SECTION):
                 formatted = get_formatted_item(
-                    bucket[i]["display"], bucket[i]["hashes"], repo, commit_authors
+                    cast(str, bucket_list[i]["display"]),
+                    cast(list, bucket_list[i]["hashes"]),
+                    repo,
+                    commit_authors,
                 )
                 out.append(f"- {formatted}")
-            remaining = len(bucket) - MAX_PER_SECTION
+            remaining = len(bucket_list) - MAX_PER_SECTION
             out.append("")
             out.append("<details>")
             out.append(f"<summary>Show {remaining} more changes…</summary>")
             out.append("")
-            for i in range(MAX_PER_SECTION, len(bucket)):
+            for i in range(MAX_PER_SECTION, len(bucket_list)):
                 formatted = get_formatted_item(
-                    bucket[i]["display"], bucket[i]["hashes"], repo, commit_authors
+                    cast(str, bucket_list[i]["display"]),
+                    cast(list, bucket_list[i]["hashes"]),
+                    repo,
+                    commit_authors,
                 )
                 out.append(f"- {formatted}")
             out.append("")
             out.append("</details>")
         else:
-            for item in bucket:
+            for item in bucket_list:
                 formatted = get_formatted_item(
-                    item["display"], item["hashes"], repo, commit_authors
+                    cast(str, item["display"]),
+                    cast(list, item["hashes"]),
+                    repo,
+                    commit_authors,
                 )
                 out.append(f"- {formatted}")
         out.append("")
@@ -419,7 +429,7 @@ def main():
     else:
         out.append(f"*Changelog generated from `{range_str}`.*")
 
-    sys.stdout.reconfigure(encoding="utf-8")
+    cast(Any, sys.stdout).reconfigure(encoding="utf-8")
     print("\n".join(out))
 
 

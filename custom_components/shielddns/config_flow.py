@@ -136,11 +136,11 @@ class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
         # Abort if already configured for this addon or local host
         for entry in self._async_current_entries():
             entry_host = entry.data.get(CONF_HOST, "")
-            entry_port = entry.data.get(CONF_PORT)
-            if (
-                entry.unique_id in (f"{matched_slug}_{port}", matched_slug, f"{matched_slug}_{DEFAULT_PORT}")
-                or entry_host in ("127.0.0.1", "localhost", host, matched_slug)
-            ):
+            if entry.unique_id in (
+                f"{matched_slug}_{port}",
+                matched_slug,
+                f"{matched_slug}_{DEFAULT_PORT}",
+            ) or entry_host in ("127.0.0.1", "localhost", host, matched_slug):
                 if not entry.unique_id:
                     self.hass.config_entries.async_update_entry(
                         entry, unique_id=f"{matched_slug}_{port}"
