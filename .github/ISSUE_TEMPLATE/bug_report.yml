@@ -27,7 +27,7 @@ body:
     attributes:
       label: Home Assistant Version
       description: Which version of Home Assistant are you running? [![Open HA Info](https://my.home-assistant.io/badges/info.svg)](https://my.home-assistant.io/redirect/info/)
-      placeholder: 2026.6.4
+      placeholder: v1.2.3
     validations:
       required: true
 
