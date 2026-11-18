@@ -39,13 +39,10 @@ SERVICE_SET_DOMAIN_MAPPING = "set_domain_mapping"
 SERVICE_SET_ROUTING_RULE = "set_routing_rule"
 SERVICE_DELETE_ROUTING_RULE = "delete_routing_rule"
 
-DOMAIN_SCHEMA = cast(
-    Any,
-    vol.Schema(
-        {
-            vol.Required("domain"): cv.string,
-        }
-    ),
+DOMAIN_SCHEMA = vol.Schema(
+    {
+        vol.Required("domain"): cv.string,
+    }
 )
 
 CLIENT_ALIAS_SCHEMA = vol.Schema(
@@ -178,11 +175,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             await coord.client.delete_routing_rule(call.data["match"])
 
     if not hass.services.has_service(DOMAIN, SERVICE_BLOCK_DOMAIN):
-from typing import Any, cast
-# ... (rest of imports)
-# (rest of file)
-
-# ... inside setup ...
         hass.services.async_register(
             DOMAIN, SERVICE_BLOCK_DOMAIN, async_block_domain, schema=cast(Any, DOMAIN_SCHEMA)
         )
@@ -199,32 +191,32 @@ from typing import Any, cast
             DOMAIN,
             SERVICE_SET_CLIENT_ALIAS,
             async_set_client_alias,
-            schema=CLIENT_ALIAS_SCHEMA,
+            schema=cast(Any, CLIENT_ALIAS_SCHEMA),
         )
     if not hass.services.has_service(DOMAIN, SERVICE_BLOCK_CLIENT):
         hass.services.async_register(
-            DOMAIN, SERVICE_BLOCK_CLIENT, async_block_client, schema=CLIENT_BLOCK_SCHEMA
+            DOMAIN, SERVICE_BLOCK_CLIENT, async_block_client, schema=cast(Any, CLIENT_BLOCK_SCHEMA)
         )
     if not hass.services.has_service(DOMAIN, SERVICE_SET_DOMAIN_MAPPING):
         hass.services.async_register(
             DOMAIN,
             SERVICE_SET_DOMAIN_MAPPING,
             async_set_domain_mapping,
-            schema=DOMAIN_MAPPING_SCHEMA,
+            schema=cast(Any, DOMAIN_MAPPING_SCHEMA),
         )
     if not hass.services.has_service(DOMAIN, SERVICE_SET_ROUTING_RULE):
         hass.services.async_register(
             DOMAIN,
             SERVICE_SET_ROUTING_RULE,
             async_set_routing_rule,
-            schema=ROUTING_RULE_SCHEMA,
+            schema=cast(Any, ROUTING_RULE_SCHEMA),
         )
     if not hass.services.has_service(DOMAIN, SERVICE_DELETE_ROUTING_RULE):
         hass.services.async_register(
             DOMAIN,
             SERVICE_DELETE_ROUTING_RULE,
             async_delete_routing_rule,
-            schema=DELETE_ROUTING_RULE_SCHEMA,
+            schema=cast(Any, DELETE_ROUTING_RULE_SCHEMA),
         )
 
     return True
