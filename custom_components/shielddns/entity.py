@@ -24,7 +24,9 @@ class ShieldDNSEntity(CoordinatorEntity[ShieldDNSDataUpdateCoordinator]):
     @property
     def device_info(self) -> DeviceInfo:
         """Return device information."""
-        version = self.coordinator.data.get("stats", {}).get("version", "Unknown")
+        version = "Unknown"
+        if self.coordinator.data and "stats" in self.coordinator.data:
+             version = self.coordinator.data["stats"].get("version", "Unknown")
         return DeviceInfo(
             identifiers={(DOMAIN, self.entry_id)},
             name=f"ShieldDNS ({self.coordinator.host})",
@@ -33,3 +35,8 @@ class ShieldDNSEntity(CoordinatorEntity[ShieldDNSDataUpdateCoordinator]):
             sw_version=version,
             configuration_url=self.coordinator.admin_url,
         )
+
+    @property
+    def available(self) -> bool:
+        """Return if entity is available."""
+        return self.coordinator.last_update_success
