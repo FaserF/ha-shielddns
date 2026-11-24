@@ -4,11 +4,66 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Version bump level"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      draft:
+        description: "Create as draft release"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
 
 jobs:
+  prepare:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    outputs:
+      tag_name: ${{ steps.bump.outputs.tag_name }}
+    steps:
+      - name: Generate Bot Token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        continue-on-error: true
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Bump Version & Push Tag
+        id: bump
+        run: |
+          NEW_VER=$(python3 .github/scripts/version_manager.py bump --type stable --level "${{ inputs.release_type }}")
+          TAG="v${NEW_VER}"
+          git config user.name "faserf-hermes-agent[bot]"
+          git config user.email "342667397+faserf-hermes-agent[bot]@users.noreply.github.com"
+          git add custom_components/*/manifest.json pyproject.toml
+          git diff --staged --quiet || git commit -m "chore(release): ${TAG} [skip ci]"
+          git tag -f "${TAG}"
+          git push origin HEAD:main
+          git push origin "${TAG}" --force
+          echo "tag_name=${TAG}" >> "$GITHUB_OUTPUT"
+
   release:
+    needs: prepare
+    if: always() && (github.event_name == 'push' || needs.prepare.result == 'success')
     uses: FaserF/repo-template/.github/workflows/reusable-release.yml@v1.0.10
+    with:
+      tag_name: ${{ github.event_name == 'workflow_dispatch' && needs.prepare.outputs.tag_name || github.ref_name }}
+      draft: ${{ github.event_name == 'workflow_dispatch' && inputs.draft || false }}
     secrets: inherit
