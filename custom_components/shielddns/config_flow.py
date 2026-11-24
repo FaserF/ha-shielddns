@@ -164,7 +164,9 @@ class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
                 )
                 or uuid_matched
             ):
-                if not entry_unique_id or entry_unique_id.startswith(f"{matched_slug}_"):
+                if not entry_unique_id or entry_unique_id.startswith(
+                    f"{matched_slug}_"
+                ):
                     self.hass.config_entries.async_update_entry(
                         entry, unique_id=matched_slug
                     )
