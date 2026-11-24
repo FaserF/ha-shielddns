@@ -18,6 +18,17 @@
         "data": {
           "token": "API-Token"
         }
+      },
+      "reconfigure": {
+        "title": "ShieldDNS neu konfigurieren",
+        "description": "Aktualisiere die Verbindungsdaten deiner ShieldDNS-Instanz.",
+        "data": {
+          "host": "Host/IP-Adresse",
+          "port": "Port",
+          "token": "API-Token",
+          "use_ssl": "HTTPS verwenden (SSL/TLS)",
+          "verify_ssl": "SSL-Zertifikat prüfen"
+        }
       }
     },
     "error": {
@@ -26,7 +37,9 @@
       "unknown": "Unerwarteter Fehler"
     },
     "abort": {
-      "already_configured": "Gerät ist bereits konfiguriert"
+      "already_configured": "Gerät ist bereits konfiguriert",
+      "not_supported": "Gerät wird nicht unterstützt",
+      "reconfigure_successful": "Neukonfiguration war erfolgreich"
     }
   },
   "options": {

@@ -30,6 +30,7 @@ class ShieldDNSApiClient:
         session: aiohttp.ClientSession,
         use_ssl: bool = True,
         verify_ssl: bool = True,
+        timeout: int = 30,
     ) -> None:
         """Initialize."""
         self._host = host
@@ -38,6 +39,7 @@ class ShieldDNSApiClient:
         self._session = session
         self._use_ssl = use_ssl
         self._verify_ssl = verify_ssl
+        self._timeout = timeout
 
         schema = "https" if use_ssl else "http"
         self._base_url = f"{schema}://{host}:{port}/api"
@@ -61,7 +63,7 @@ class ShieldDNSApiClient:
         headers["X-Shield-Request"] = "true"
 
         try:
-            async with asyncio.timeout(10):
+            async with asyncio.timeout(self._timeout):
                 response = await self._session.request(
                     method=method,
                     url=url,
@@ -78,11 +80,11 @@ class ShieldDNSApiClient:
 
         except TimeoutError as exception:
             raise ShieldDNSApiClientCommunicationError(
-                "Timeout occurred"
+                f"Timeout communicating with {self._host}:{self._port}"
             ) from exception
         except (aiohttp.ClientError, socket.gaierror) as exception:
             raise ShieldDNSApiClientCommunicationError(
-                f"Error communicating with API: {exception}"
+                f"{self._host}:{self._port}: {exception}"
             ) from exception
 
     async def get_stats(self) -> dict[str, Any]:

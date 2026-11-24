@@ -130,27 +130,47 @@ class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
             addon_info = await addon_manager.async_get_addon_info()
             if addon_info.options:
                 port = addon_info.options.get("doh_port", DEFAULT_PORT)
-        except Exception:
-            pass
+        except Exception as err:  # pylint: disable=broad-except
+            LOGGER.debug("Could not fetch addon info for %s: %s", matched_slug, err)
 
         self._host = host
         self._port = port
 
-        # Abort if already configured for this addon or local host
+        discovery_uuid = getattr(discovery_info, "uuid", None)
+        # Abort if already configured for this addon (including legacy port-suffixed unique_ids)
         for entry in self._async_current_entries():
             entry_host = entry.data.get(CONF_HOST, "")
-            if entry.unique_id in (
-                f"{matched_slug}_{port}",
-                matched_slug,
-                f"{matched_slug}_{DEFAULT_PORT}",
-            ) or entry_host in ("127.0.0.1", "localhost", host, matched_slug):
-                if not entry.unique_id:
+            entry_unique_id = entry.unique_id or ""
+            hassio_keys = (
+                entry.discovery_keys.get("hassio", ())
+                if hasattr(entry, "discovery_keys") and entry.discovery_keys
+                else ()
+            )
+            uuid_matched = bool(
+                discovery_uuid
+                and any(getattr(k, "key", None) == discovery_uuid for k in hassio_keys)
+            )
+            if (
+                entry_unique_id == matched_slug
+                or entry_unique_id.startswith(f"{matched_slug}_")
+                or entry_host
+                in (
+                    "127.0.0.1",
+                    "localhost",
+                    "::1",
+                    host,
+                    f"{host}.local.hass.io",
+                    matched_slug,
+                )
+                or uuid_matched
+            ):
+                if not entry_unique_id or entry_unique_id.startswith(f"{matched_slug}_"):
                     self.hass.config_entries.async_update_entry(
-                        entry, unique_id=f"{matched_slug}_{port}"
+                        entry, unique_id=matched_slug
                     )
                 return self.async_abort(reason="already_configured")
 
-        await self.async_set_unique_id(f"{matched_slug}_{port}")
+        await self.async_set_unique_id(matched_slug)
         self._abort_if_unique_id_configured()
 
         return await self.async_step_hassio_confirm()
@@ -181,6 +201,70 @@ class ShieldDNSConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore
             data_schema=cast(Any, vol.Schema({vol.Required(CONF_TOKEN): str})),
             errors=errors,
             description_placeholders={"addon": self._addon_slug or ""},
+        )
+
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle reconfiguration of an existing ShieldDNS entry."""
+        reconfigure_entry = self._get_reconfigure_entry()
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            try:
+                info = await validate_input(self.hass, user_input)
+            except ShieldDNSApiClientAuthenticationError:
+                errors["base"] = "invalid_auth"
+            except ShieldDNSApiClientCommunicationError:
+                errors["base"] = "cannot_connect"
+            except Exception:  # pylint: disable=broad-except
+                errors["base"] = "unknown"
+            else:
+                if CONF_TOKEN in reconfigure_entry.options:
+                    updated_options = dict(reconfigure_entry.options)
+                    updated_options[CONF_TOKEN] = user_input[CONF_TOKEN]
+                    return self.async_update_reload_and_abort(
+                        reconfigure_entry,
+                        title=info["title"],
+                        data_updates=user_input,
+                        options=updated_options,
+                    )
+                return self.async_update_reload_and_abort(
+                    reconfigure_entry,
+                    title=info["title"],
+                    data_updates=user_input,
+                )
+
+        current_data = reconfigure_entry.data
+        current_token = reconfigure_entry.options.get(
+            CONF_TOKEN, current_data.get(CONF_TOKEN, "")
+        )
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=cast(
+                Any,
+                vol.Schema(
+                    {
+                        vol.Required(
+                            CONF_HOST, default=current_data.get(CONF_HOST, "")
+                        ): str,
+                        vol.Required(
+                            CONF_PORT,
+                            default=current_data.get(CONF_PORT, DEFAULT_PORT),
+                        ): int,
+                        vol.Required(CONF_TOKEN, default=current_token): str,
+                        vol.Optional(
+                            CONF_USE_SSL,
+                            default=current_data.get(CONF_USE_SSL, True),
+                        ): bool,
+                        vol.Optional(
+                            CONF_VERIFY_SSL,
+                            default=current_data.get(CONF_VERIFY_SSL, True),
+                        ): bool,
+                    }
+                ),
+            ),
+            errors=errors,
         )
 
     @staticmethod

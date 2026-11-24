@@ -68,9 +68,7 @@ rules:
   entity-translations: done
   exception-translations: done
   icon-translations: done
-  reconfiguration-flow:
-    status: exempt
-    comment: Reconfiguration is handled via standard options flow or re-authentication.
+  reconfiguration-flow: done
   repair-issues:
     status: exempt
     comment: The integration does not require repair flows.

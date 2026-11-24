@@ -6,9 +6,14 @@ from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .client import ShieldDNSApiClient, ShieldDNSApiClientError
+from .client import (
+    ShieldDNSApiClient,
+    ShieldDNSApiClientAuthenticationError,
+    ShieldDNSApiClientError,
+)
 from .const import DOMAIN, LOGGER
 
 
@@ -43,7 +48,7 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         super().__init__(
             hass,
             LOGGER,
-            name=DOMAIN,
+            name=f"{DOMAIN} ({host}:{port})",
             **init_kwargs,
         )
 
@@ -100,7 +105,11 @@ class ShieldDNSDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
             LOGGER.debug("ShieldDNS data update: %s", data)
             return data
+        except ShieldDNSApiClientAuthenticationError as exception:
+            raise ConfigEntryAuthFailed(
+                f"Authentication failed for {self.host}:{self.port}: {exception}"
+            ) from exception
         except ShieldDNSApiClientError as exception:
             raise UpdateFailed(
-                f"Error communicating with API: {exception}"
+                f"Error communicating with API ({self.host}:{self.port}): {exception}"
             ) from exception
